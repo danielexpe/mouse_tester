@@ -105,8 +105,8 @@
 - [x] Aviso de segurança do grupo `input` no instalador/docs.
 - [x] Checksum validado no diretório do pacote.
 - [x] Notas de release **sem** o hash do próprio pacote.
-- [ ] Tag e release com notas + artefatos, se solicitado.
-- [ ] Hash e URL registrados em `AGENTS.md`.
+- [x] Tag e release com notas + artefatos: v1.0.0.
+- [x] Hash e URL registrados em `AGENTS.md`.
 
 ## 7. Critérios de bloqueio
 

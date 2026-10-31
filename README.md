@@ -5,8 +5,8 @@
 > Alvos e captura PNG. O backend framebuffer foi validado em VT local
 > 1920×1080 32 bpp.
 >
-> Nome e binário: **Mouse Tester** (`mouse_tester`). Q-001 resolvida em
-> [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
+> Nome e binário: **Mouse Tester** (`mouse_tester`). Release:
+> [v1.0.0](https://github.com/danielexpe/mouse_tester/releases/tag/v1.0.0).
 
 Aplicativo Rust para console Linux que transforma cada ação de um mouse em
 feedback visual imediato: movimento, botões, scroll vertical/horizontal, botões

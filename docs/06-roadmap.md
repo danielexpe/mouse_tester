@@ -184,7 +184,7 @@ normal; o eixo Y invertido e a detecção de VT foram corrigidos nessa rodada.
 
 ## 8. Fase 5 — Release
 
-**Status:** pacote 1.0.0 preparado; publicação em andamento.
+**Status:** concluída; release 1.0.0 publicada.
 
 Objetivo: entregar um pacote reproduzível.
 
@@ -207,8 +207,11 @@ Critérios de saída:
 - [x] Instalador testado com prefixo temporário; sudo/grupos reais pendente.
 - [x] Binário copiado funciona sozinho.
 - [x] Checksum validado.
-- [ ] `AGENTS.md` com hash/URL da release.
+- [x] `AGENTS.md` com hash/URL da release.
 - [x] Nenhum terminal/console corrompido nos caminhos validados.
+
+Evidência: `https://github.com/danielexpe/mouse_tester/releases/tag/v1.0.0`;
+SHA-256 `dacbd8b736b6027663528bfca52fa8d827f8d00de0b7759f8b3ad24f4ddb97f3`.
 
 ## 9. Fase 6 — Backlog
 
