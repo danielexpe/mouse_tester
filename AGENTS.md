@@ -20,7 +20,7 @@ Data de referência: **2026-10-31**.
 | 3 — Modos ricos | implementada; testada manualmente | performance da TUI ainda não medida |
 | 4 — Framebuffer | implementada e validada em VT | tty3, 1920×1080 32 bpp; 24/16 bpp pendentes |
 | 5 — Release | concluída | v1.0.0 publicada; pacote e checksum validados |
-| 6 — Backlog | pendente | DRM/KMS, hidraw, exportação, touchpad |
+| 6 — Backlog | arquivada | não priorizada; itens preservados para revisão futura |
 
 As Fases 1, 2 e 3 foram implementadas. A TUI abre e fecha via PTY; a entrada
 evdev foi implementada com descoberta, classificação, thread de leitura, hotplug
@@ -157,6 +157,7 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Nome final ajustado para `mouse_tester`/`Mouse Tester` em pacote, binário, UI, docs, testes, snapshots e captura. Criado repositório público `danielexpe/mouse_tester`; `origin` aponta para ele e o antigo template fica como `template`. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, `testes_debug.sh`, docs |
 | 2026-10-31 | Fase 5 preparada: versão 1.0.0, `LICENSE` MIT, `THIRD_PARTY_NOTICES.md` + `licenses/`, `install.sh` com `--add-input-group`/`--skip-groups`, `scripts/package.sh`, `RELEASE_NOTES.md` e matriz manual. Pacote `mouse_tester-1.0.0-linux-x86_64.tar.gz` gerado e testado em `/tmp`. | `Cargo.toml`, `Cargo.lock`, `LICENSE`, `THIRD_PARTY_NOTICES.md`, `licenses/`, `install.sh`, `scripts/package.sh`, `RELEASE_NOTES.md`, `docs/11-manual-matrix.md` |
 | 2026-10-31 | Release 1.0.0 publicada: https://github.com/danielexpe/mouse_tester/releases/tag/v1.0.0. Artefato `mouse_tester-1.0.0-linux-x86_64.tar.gz` (SHA-256 `dacbd8b736b6027663528bfca52fa8d827f8d00de0b7759f8b3ad24f4ddb97f3`), checksum e `testes_debug.sh`. Smoke em `/tmp`, instalador por prefixo e reprodução do tar validados. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/10-release-checklist.md` |
+| 2026-10-31 | Fase 6 arquivada por decisão do usuário: os itens de backlog não agregam valor no momento e a v1.0.0 atende ao objetivo. Backlog preservado para revisão futura. | `AGENTS.md`, `docs/06-roadmap.md` |
 
 ## 11. Fases
 
@@ -174,7 +175,8 @@ declarar validação manual sem execução registrada.
 
 - Fases 2 e 3 implementadas; evdev validado com mouse HID `1bcf:08a0`
   (fonte `evdev`) em terminal GNOME.
-- Próximo passo: Fase 6 (backlog), priorizando itens com o usuário.
+- Nenhuma fase ativa: a v1.0.0 atende ao objetivo. A Fase 6 (backlog) foi
+  arquivada e pode ser revista futuramente, sem compromisso de implementação.
 - Pendências: 24/16 bpp do fb em hardware, sinais/pânico do fb, matriz completa
   de snapshots e performance da TUI.
 - A sessão do agente continua fora do grupo `input`; para reproduzir testes

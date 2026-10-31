@@ -18,7 +18,7 @@
 | 3 — Modos ricos | alvos/arraste/duplo clique, acessibilidade, captura | modos + captura determinística |
 | 4 — Framebuffer | fbdev, cursor, sinais, validação em VT | fb validado ou pendência registrada |
 | 5 — Release | pacote, instalador, diagnóstico, docs | release v1.0 validado |
-| 6 — Backlog | DRM/KMS, hidraw, exportação, touchpad | priorizado pelo usuário |
+| 6 — Backlog | itens de evolução futura | não priorizada/arquivada |
 
 ## 3. Fase 0 — Descoberta e especificação
 
@@ -215,7 +215,10 @@ SHA-256 `dacbd8b736b6027663528bfca52fa8d827f8d00de0b7759f8b3ad24f4ddb97f3`.
 
 ## 9. Fase 6 — Backlog
 
-Ordenar com o usuário:
+**Status:** arquivada em 2026-10-31. Os itens não serão desenvolvidos no momento;
+a v1.0.0 atende ao objetivo. O backlog é preservado para revisão futura.
+
+Ordenar com o usuário, caso a fase seja retomada:
 
 1. DRM/KMS como backend alternativo.
 2. hidraw para reports, DPI e latência.
