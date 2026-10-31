@@ -16,18 +16,20 @@ Data de referência: **2026-10-31**.
 | --- | --- | --- |
 | 0 — Descoberta e especificação | concluída | escopo aprovado pelo usuário em 2026-10-31 |
 | 1 — Fundação | concluída | crate, domínio puro, CLI, mock, TUI placeholder; 78 testes |
-| 2 — TUI funcional | implementada; evdev real validado | mouse HID 1bcf:08a0; extras/hotplug/snapshots pendentes |
-| 3 — Modos ricos | pendente | alvos/arraste/clique duplo, polimento |
+| 2 — TUI funcional | implementada; evdev e extras validados | mouse HID 1bcf:08a0; scroll hi-res/hotplug ok; snapshots parciais |
+| 3 — Modos ricos | implementada; testada manualmente | performance da TUI ainda não medida |
 | 4 — Framebuffer | pendente | fbdev, cursor, sinais, validação em VT |
 | 5 — Release | pendente | pacote, instalador, diagnóstico, matriz manual |
 | 6 — Backlog | pendente | DRM/KMS, hidraw, exportação, touchpad |
 
-As Fases 1 e 2 foram implementadas. A TUI abre e fecha via PTY; a entrada evdev
-foi implementada com descoberta, classificação, thread de leitura, hotplug e
-fallback `crossterm`. A leitura real foi validada com o mouse HID `1bcf:08a0`
+As Fases 1, 2 e 3 foram implementadas. A TUI abre e fecha via PTY; a entrada
+evdev foi implementada com descoberta, classificação, thread de leitura, hotplug
+e fallback `crossterm`. A leitura real foi validada com o mouse HID `1bcf:08a0`
 (fonte `evdev`) em terminal GNOME; o modo degradado também foi validado em PTY.
-Extras, scroll hi-res, hotplug e snapshots completos seguem pendentes.
-framebuffer e captura ainda não existem.
+A Fase 3 adicionou o modo Alvos com seed, captura PNG determinística e snapshots
+de texto. O usuário validou extras, scroll hi-res/horizontal e hotplug em
+hardware e testou a Fase 3; a performance da TUI ainda não foi medida.
+framebuffer ainda não existe.
 
 ## 3. Resumo do produto
 
@@ -37,9 +39,9 @@ taxa de relatório com efeitos em uma TUI (`ratatui`) ou no framebuffer
 (`/dev/fb0`). O mouse é o objeto do teste; a UI é navegada apenas por teclado.
 A TUI é o backend padrão; o framebuffer é explícito.
 
-Estado atual: Fase 2 implementada com domínio puro, CLI, evdev, fallback,
-desafios, seletor de dispositivo e diagnóstico textual. `--demo` continua
-disponível para inspeção sem hardware.
+Estado atual: Fase 3 implementada com domínio puro, CLI, evdev, fallback,
+desafios, Alvos, captura PNG, seletor de dispositivo e diagnóstico textual.
+`--demo` continua disponível para inspeção sem hardware.
 
 ## 4. Decisões congeladas
 
@@ -85,7 +87,7 @@ Não reabrir sem pedido explícito do usuário; mudanças exigem novo ADR.
 | Q-001 | Confirmar nome/binary `MouseScope`/`mousescope`. | em uso; confirmar antes da release | antes da Fase 5 |
 | Q-002 | Distribuição pessoal ou release pública? | release pública | antes da Fase 5 |
 | Q-003 | Instalador deve adicionar o usuário ao grupo `input`? | apenas instruir; flag opcional | antes da Fase 5 |
-| Q-004 | Hardware/distro alvo para validar fbdev? | VT local 1920×1080 32 bpp | antes da Fase 4 |
+| Q-004 | Hardware/distro alvo para validar fbdev? | resolvida: Zorin OS 18.1 / base Ubuntu, VT 1920×1080 32 bpp | antes da Fase 4 |
 | Q-005 | Touchpad na v1? | apenas seleção explícita, básico | antes da Fase 3 |
 | Q-006 | Exportar métricas de sessão? | backlog (CSV/JSON) | Fase 6 |
 | Q-007 | Medir DPI com deslocamento físico? | backlog | Fase 6 |
@@ -143,6 +145,8 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Fase 1 implementada: crate, domínio puro, input mock, CLI, TUI placeholder e guardas. 78 testes; TUI validada em PTY com `q`. Sem evdev/fb. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/cli.rs`, `README.md`, `AGENTS.md`, `docs/06-roadmap.md` |
 | 2026-10-31 | Fase 2 implementada: evdev (descoberta, classificação, thread, hotplug), fallback TUI, seletor, desafios, diagnóstico. 120 testes; modo degradado e clique SGR validados em PTY. Leitura real pendente por falta de permissão em `/dev/input`. | `src/input/`, `src/platform/evdev.rs`, `src/core/modes/`, `src/diagnostics.rs`, `src/app.rs`, `src/render/tui.rs`, docs |
 | 2026-10-31 | Leitura evdev validada em hardware com mouse HID `1bcf:08a0` (fonte `evdev`) em terminal GNOME. Modo degradado segue validado em PTY; extras/hotplug/snapshots pendentes. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-input-spec.md` |
+| 2026-10-31 | Fase 3 implementada: modo Alvos (clique/arraste/duplo clique, seed, métricas), captura PNG determinística 1344×756 sem dependências, snapshots de TUI, snapshot de captura e teste de contraste. 144 testes. Performance de TUI ainda não medida. | `src/core/modes/targets.rs`, `src/render/capture.rs`, `src/state/session.rs`, `src/render/tui.rs`, `tests/snapshots.rs`, docs |
+| 2026-10-31 | Validação manual do usuário: botões extras, scroll hi-res/horizontal e hotplug OK; modo Alvos e captura testados. Q-004 respondida: Zorin OS 18.1 (base Ubuntu noble), VT `tty2`, `/dev/fb0` 1920×1080 32 bpp; alvo: distros base Ubuntu. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` |
 
 ## 11. Fases
 
@@ -158,10 +162,12 @@ declarar validação manual sem execução registrada.
 
 ## 12. Notas para a próxima sessão
 
-- Fase 2 implementada; leitura evdev validada com mouse HID `1bcf:08a0`
+- Fases 2 e 3 implementadas; evdev validado com mouse HID `1bcf:08a0`
   (fonte `evdev`) em terminal GNOME.
-- Próximo passo: iniciar a Fase 3 (alvos/arraste/duplo clique e captura),
-  cobrindo extras/hotplug/snapshots pendentes quando possível.
+- Próximo passo: Fase 4 (framebuffer), após definir hardware/distro (Q-004).
+- Pendências da Fase 2/3: matriz completa de snapshots e performance medida.
+- A sessão do agente continua fora do grupo `input`; para reproduzir testes
+  evdev, usar `newgrp input`/`sg input`. O usuário validou em sessão própria.
 - VT Linux não recebe mouse sem evdev; o suporte completo a console depende do
   backend framebuffer da Fase 4.
 - Q-001..Q-008 continuam em aberto; os defaults estão em uso.

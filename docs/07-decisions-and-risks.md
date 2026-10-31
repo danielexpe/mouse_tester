@@ -207,7 +207,7 @@ Detalhes em `docs/02-technical-spec.md`.
 | Q-001 | Nome/binary definitivos? | `MouseScope`/`mousescope` | antes da Fase 1 | usuário |
 | Q-002 | Distribuição pessoal ou release pública? | release pública | antes da Fase 5 | usuário |
 | Q-003 | Instalador adiciona ao grupo `input`? | apenas instruir; flag `--add-input-group` | antes da Fase 5 | usuário |
-| Q-004 | Hardware/distro para validar fb? | VT local 1920×1080 32 bpp | antes da Fase 4 | usuário |
+| Q-004 | Hardware/distro para validar fb? | resolvida: Zorin OS 18.1 (base Ubuntu), VT `tty2`, 1920×1080 32 bpp | antes da Fase 4 | usuário |
 | Q-005 | Touchpad na v1? | seleção explícita básica | antes da Fase 3 | usuário |
 | Q-006 | Exportar métricas? | backlog CSV/JSON | Fase 6 | usuário |
 | Q-007 | Medir DPI? | backlog | Fase 6 | usuário |

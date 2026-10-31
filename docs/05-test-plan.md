@@ -81,7 +81,7 @@ Pirâmide:
 - Desafio de botões: esperado derivado de capacidades; extras; conclusão.
 - Desafio de scroll: 4 etapas; horizontal condicional; reset.
 - Taxa: amostra insuficiente; resultado; reinício.
-- Alvos (Fase 3): seed reproduz posições; acerto/erro; arraste.
+- Alvos: seed reproduz posições; clique/arraste/duplo clique; acerto/erro; reset.
 - Troca de modo preserva estado global; reset é explícito.
 
 ### 2.7 Sessão e i18n
@@ -134,18 +134,13 @@ Pirâmide:
 
 ## 5. Testes de TUI
 
-- Snapshots de texto para:
-  - Dashboard Wide/Normal/Compact/Minimal;
-  - pt-BR e en;
-  - sem dispositivo;
-  - degradado (TUI mouse);
-  - permissão negada;
-  - overflow;
-  - ajuda;
-  - desafio de botões em andamento e concluído;
-  - scroll 2/4;
-  - taxa sem dados e com 1000 Hz;
-  - modo alvos (Fase 3).
+- Snapshots de texto implementados em `tests/snapshots.rs` (comparador com
+  `UPDATE_SNAPSHOTS=1`); cobertura atual:
+  - modo Alvos Wide pt-BR e Normal en;
+  - modo Alvos Normal com paleta mono;
+  - Dashboard Wide em modo degradado.
+- Expansão da matriz (Compact/Minimal, erro de permissão, overflow, ajuda,
+  desafios e taxa) segue pendente.
 - Comparador próprio de texto; `UPDATE_SNAPSHOTS=1` regenera e o diff é
   revisado.
 - Versão no cabeçalho muda snapshots; esperado por release.
@@ -249,12 +244,12 @@ Registrar em `docs/06-roadmap.md` ou relatório de release; não inventar.
 - [ ] Desafio de botões: todos os botões advertising.
 - [ ] Desafio de scroll: 4 direções quando suportadas.
 - [ ] Taxa: 2 s de movimento, confiança média/alta, ±10% de 125/500/1000 Hz.
-- [ ] Alvos/arraste/duplo clique (Fase 3).
+- [x] Alvos/arraste/duplo clique (testes de domínio e snapshot).
 - [ ] Log bruto.
 - [ ] Seletor de dispositivo.
 - [ ] Troca de idioma em todas as telas.
 - [ ] `--no-animations`, `NO_COLOR`, mono.
-- [ ] Captura PNG.
+- [x] Captura PNG (`--capture-frame`, 1344×756, determinística).
 - [ ] Diagnóstico textual.
 - [ ] Saída limpa em terminal e console.
 
@@ -294,7 +289,7 @@ Adicionar verificação de MSRV quando o CI existir.
 ## 12. Critérios de conclusão de teste
 
 - [ ] Unitários de domínio, parser e métricas verdes.
-- [ ] Snapshots revisados.
+- [x] Snapshots revisados (targets pt/en/mono e degradado).
 - [ ] PTY cobre entrada, saída e restauração.
 - [ ] Testes de fb sem hardware verdes.
 - [ ] Captura determinística.

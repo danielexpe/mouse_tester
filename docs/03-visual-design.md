@@ -288,10 +288,15 @@ V +0  H 0  hi-res 0
 
 ### 12.3 Alvos (Fase 3)
 
-- Alvo circular com anel de acerto.
-- Modos: clique, arraste e duplo clique.
-- Métricas: tempo, erro de distância ao centro, taxa de acerto.
-- Seed controla posições; reinício preserva seed até `R` explícito.
+- Alvo circular com anel de acerto e cruz de mira; cor indica o tipo.
+- Modos: clique, arraste e duplo clique, em nove rodadas.
+- Clique: acerta com o botão esquerdo dentro do raio.
+- Arraste: pressão dentro do raio, movimento mínimo e soltura; parado conta
+  como erro.
+- Duplo clique: duas pressões dentro do raio em até 400 ms.
+- Métricas: tempo, erro de distância ao centro, taxa de acerto e últimas
+  tentativas.
+- Seed controla posições; `R` reinicia com a mesma seed.
 
 ## 13. Estados e mensagens
 
@@ -326,7 +331,9 @@ stderr após restaurar.
 - `--capture-frame` gera 1344×756 com estado sintético:
   - cursor deslocado, rastro, um anel de clique, scroll +3, botões L/R/M,
   - taxa 1000 Hz, jitter 42 µs, confiança alta.
-- Captura é usada em docs e testes; nunca depende de hardware.
+- Captura é usada em testes; nunca depende de hardware.
+- Na Fase 3 a captura usa pintor RGBA e fonte 5×7 embutidos; o render final
+  com `tiny-skia`/`fontdue` continua previsto para o framebuffer.
 - Snapshots de TUI usam layout Wide e Normal, pt-BR e en, estados normal,
   degradado e sem dispositivo.
 - Versão no cabeçalho muda snapshots por release; revisar o diff é esperado.

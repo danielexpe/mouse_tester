@@ -1,8 +1,9 @@
 # MouseScope
 
-> **Status: Fase 2 implementada; evdev real validado.** A TUI lê evdev quando
-> há permissão, descobre dispositivos, faz hotplug, oferece fallback degradado e
-> desafios. framebuffer e captura ainda não existem.
+> **Status: Fase 3 implementada; evdev real validado.** A TUI lê evdev quando
+> há permissão, descobre dispositivos, faz hotplug, oferece fallback degradado,
+> desafios e modo Alvos. A captura PNG determinística já existe; framebuffer
+> ainda não.
 >
 > Nome provisório: **MouseScope** (`mousescope`). Veja a questão aberta Q-001 em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
@@ -23,7 +24,7 @@ relativo real, códigos de botão, wheel de alta resolução e timestamps do ker
 A TUI pode cair para eventos de mouse do terminal (`crossterm`) quando não há
 permissão de evdev, com limitações explicitamente sinalizadas.
 
-## Estado atual (Fase 2)
+## Estado atual (Fase 3)
 
 Implementado:
 
@@ -32,17 +33,20 @@ Implementado:
 - normalização de movimento, botões, scroll normal/hi-res e absolutos básicos;
 - fallback degradado com mouse do terminal quando evdev é negado;
 - seletor de dispositivo, desafio de botões e desafio de scroll;
+- modo Alvos com clique, arraste e duplo clique, seed reproduzível e métricas;
+- captura PNG determinística 1344×756 (`--capture-frame`), sem evdev ou TTY;
+- snapshots de texto da TUI para alvos, mono e modo degradado;
 - estimador de taxa com histograma, jitter e confiança;
 - diagnóstico textual (`--diagnostics`) e lista de dispositivos;
 - CLI com `--device`, `--grab`, `--grab-force`, `--require-evdev`,
-  `--tui-mouse`, `--mode`, `--lang`, `--color`, `--list-devices`;
+  `--tui-mouse`, `--mode`, `--lang`, `--color`, `--list-devices`,
+  `--capture-frame`;
 - TUI `ratatui` com banner, log, ajuda e layouts Wide/Normal/Compact/Minimal;
-- 120 testes (115 unitários + 5 de integração de CLI).
+- 144 testes (132 unitários + 7 de CLI + 5 snapshots).
 
 Leitura evdev validada com o mouse HID `1bcf:08a0` (fonte `evdev`). O caminho
 degradado foi validado em PTY. Pendentes: exercício de extras/scroll hi-res e
-hotplug em hardware, snapshots completos, alvos/arraste/duplo clique,
-framebuffer e captura PNG.
+hotplug em hardware, performance medida e backend framebuffer.
 
 ## Rodando
 
@@ -51,6 +55,7 @@ cargo run                          # TUI, evdev ou fallback
 cargo run -- --demo                # TUI com eventos sintéticos
 cargo run -- --list-devices        # lista pontos de entrada e permissões
 cargo run -- --diagnostics diag.txt
+cargo run -- --capture-frame captura.png --seed 7
 cargo run -- --device /dev/input/event5
 cargo test                         # testes de domínio, TUI, input e CLI
 ```
@@ -67,6 +72,8 @@ cargo test                         # testes de domínio, TUI, input e CLI
 - **Desafio de botões:** guia o usuário a pressionar todos os botões suportados
   e marca os que faltam.
 - **Desafio de scroll:** confirma cima/baixo/esquerda/direita.
+- **Alvos:** nove rodadas de clique, arraste e duplo clique com acerto, erro,
+  tempo e seed reproduzível.
 - **Log bruto:** últimos eventos normalizados, com filtro por tipo.
 - **Dispositivos:** descoberta, escolha do dispositivo primário, capacidades e
   hotplug.
@@ -102,11 +109,12 @@ nunca um controle da UI, para evitar que um clique de teste altere o aplicativo.
 | `F1` ou `?` | Ajuda |
 | `Q`, `Esc` ou `Ctrl+C` | Sair |
 `T` abre o seletor de dispositivo. Os desafios de botões e scroll estão nos
-modos 2 e 3. Alvos/arraste/duplo clique ficam para a Fase 3.
+modos 2 e 3; o modo Alvos (clique, arraste e duplo clique) é o modo 5.
 
 ## Requisitos
 
-- Linux x86_64, Rust stable (MSRV 1.88, edição 2021).
+- Linux x86_64, Rust stable (MSRV 1.88, edição 2021). Validado em Zorin OS
+  18.1; alvo de compatibilidade: distribuições base Ubuntu.
 - Terminal local com TTY para a TUI; SSH funciona de forma degradada.
 - Para evdev: permissão de leitura em `/dev/input/event*` (tipicamente grupo
   `input`; alguns sistemas usam `plugdev`). Sem ela, a TUI cai para o mouse do
@@ -122,6 +130,7 @@ mousescope                          # TUI, evdev ou fallback
 mousescope --backend fb             # console, exige VT e permissões
 mousescope --list-devices           # lista pontos de entrada
 mousescope --diagnostics diag.txt   # ambiente, permissões e capacidades
+mousescope --capture-frame qa.png   # PNG determinístico de QA
 ```
 
 O pacote futuro incluirá binário, `README`, licenças, `install.sh` e
@@ -171,6 +180,8 @@ pode ler teclado).
   do sensor. Isso é backlog.
 - Sem framebuffer em Wayland/X11/SSH; diagnóstico recusa esses ambientes.
 - Touchpad/tablet têm suporte básico apenas quando selecionados explicitamente.
+- A captura PNG usa pintor RGBA e fonte 5×7 embutidos; é uma referência
+  determinística de QA, não o render final do framebuffer.
 - Não altera configurações do mouse (DPI, polling, RGB, macros).
 
 ## Licenças planejadas

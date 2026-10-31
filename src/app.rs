@@ -73,6 +73,7 @@ pub struct AppConfig {
     pub theme: Theme,
     pub flags: UiFlags,
     pub initial_mode: Mode,
+    pub seed: u64,
     pub demo_seed: Option<u64>,
     pub controller: Option<InputController>,
     pub grab: bool,
@@ -102,7 +103,8 @@ pub struct App {
 
 impl App {
     pub fn new(config: AppConfig) -> Self {
-        let mut session = Session::new(config.bounds);
+        let mut session = Session::with_seed(config.bounds, config.seed);
+        session.set_mode(config.initial_mode);
         let demo = if let Some(seed) = config.demo_seed {
             session.add_device(DeviceInfo::mock(1));
             Some(DemoSource::new(1, seed))
@@ -312,6 +314,7 @@ mod tests {
             theme: Theme::default(),
             flags: UiFlags::default(),
             initial_mode: Mode::Dashboard,
+            seed: 1,
             demo_seed: Some(1),
             controller: None,
             grab: false,

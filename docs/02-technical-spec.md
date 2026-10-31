@@ -337,7 +337,7 @@ mousescope [OPTIONS]
   --no-animations
   --no-trail
   --raw-log
-  --demo                           eventos sintéticos (Fase 1/depuração)
+  --demo                           eventos sintéticos (depuração)
   --capture-frame <PATH>           PNG determinístico e sai
   --diagnostics <PATH>             relatório textual e sai
   -h, --help

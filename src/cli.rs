@@ -101,6 +101,13 @@ pub struct Cli {
     #[arg(long)]
     pub diagnostics: Option<PathBuf>,
 
+    #[arg(
+        long,
+        value_name = "PATH",
+        help = "Write a deterministic PNG frame and exit"
+    )]
+    pub capture_frame: Option<PathBuf>,
+
     #[arg(long)]
     pub device: Option<String>,
 

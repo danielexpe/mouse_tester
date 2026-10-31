@@ -168,13 +168,16 @@ Rótulos curtos no canvas: `[L]`, `[R]`, `[M]`, `[S1]`, `[S2]`, `[F]`, `[B]`,
 | `mode.buttons.skip` | Pular | Skip |
 | `mode.scroll.prompt` | Role para {direction} | Scroll {direction} |
 | `mode.scroll.progress` | {done}/{total} | {done}/{total} |
-| `mode.targets.prompt` | Clique no alvo | Click the target |
-| `mode.targets.hits` | Acertos | Hits |
-| `mode.targets.misses` | Erros | Misses |
-| `mode.targets.avg_time` | Tempo médio | Avg time |
-| `mode.targets.double` | Duplo clique | Double click |
-| `mode.targets.drag` | Arraste até o alvo | Drag to target |
-| `mode.targets.done` | Concluído | Complete |
+| `mode.targets.prompt.click` | Clique no alvo | Click the target |
+| `mode.targets.prompt.drag` | Pressione no alvo e arraste | Press on the target and drag |
+| `mode.targets.prompt.double` | Clique duas vezes no alvo | Double-click the target |
+| `mode.targets.progress` | {done}/{total} | {done}/{total} |
+| `mode.targets.accuracy` | Acerto | Accuracy |
+| `mode.targets.error` | Erro | Error |
+| `mode.targets.time` | Tempo | Time |
+| `mode.targets.hit` | Acerto! | Hit! |
+| `mode.targets.miss` | Erro | Miss |
+| `mode.targets.done` | Alvos concluídos | Targets complete |
 
 ## 10. Ajuda e rodapé
 

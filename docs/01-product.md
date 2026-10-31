@@ -193,7 +193,7 @@ Detalhes de geometria, duração e cor ficam em `docs/03-visual-design.md`.
 - [ ] Hotplug adiciona/remove dispositivo em ≤ 2 s.
 - [ ] Sem permissão, a TUI explica o que fazer e não trava.
 - [ ] `Q`/`Esc`/`Ctrl+C` restauram o terminal sem cursor escondido.
-- [ ] Captura PNG com seed fixa é byte-a-byte estável no mesmo build.
+- [x] Captura PNG com seed fixa é byte-a-byte estável no mesmo build.
 
 ### 11.2 Framebuffer
 

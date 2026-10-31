@@ -95,6 +95,15 @@ pub enum Key {
     BannerPermission,
     BannerWaiting,
     Histogram,
+    TargetsClick,
+    TargetsDrag,
+    TargetsDouble,
+    TargetsDone,
+    TargetsAccuracy,
+    TargetsError,
+    TargetsTime,
+    TargetsHit,
+    TargetsMiss,
 }
 
 pub fn tr(lang: Lang, key: Key) -> &'static str {
@@ -103,8 +112,8 @@ pub fn tr(lang: Lang, key: Key) -> &'static str {
         (Lang::En, Key::AppTitle) => "MouseScope",
         (Lang::PtBr, Key::Subtitle) => "Laboratório visual de mouse",
         (Lang::En, Key::Subtitle) => "Visual mouse lab",
-        (Lang::PtBr, Key::Phase) => "Fase 2",
-        (Lang::En, Key::Phase) => "Phase 2",
+        (Lang::PtBr, Key::Phase) => "Fase 3",
+        (Lang::En, Key::Phase) => "Phase 3",
         (Lang::PtBr, Key::Backend) => "Backend",
         (Lang::En, Key::Backend) => "Backend",
         (Lang::PtBr, Key::Source) => "Fonte",
@@ -161,8 +170,8 @@ pub fn tr(lang: Lang, key: Key) -> &'static str {
         (Lang::En, Key::NoDevice) => "No device",
         (Lang::PtBr, Key::MockSource) => "mock",
         (Lang::En, Key::MockSource) => "mock",
-        (Lang::PtBr, Key::PhaseOneHint) => "Fase 1: domínio conectado; evdev chega na Fase 2",
-        (Lang::En, Key::PhaseOneHint) => "Phase 1: domain wired; evdev arrives in Phase 2",
+        (Lang::PtBr, Key::PhaseOneHint) => "Fase 3: alvos, arraste e duplo clique",
+        (Lang::En, Key::PhaseOneHint) => "Phase 3: targets, drag and double-click",
         (Lang::PtBr, Key::DemoHint) => "demo sintética ativa (--demo)",
         (Lang::En, Key::DemoHint) => "synthetic demo active (--demo)",
         (Lang::PtBr, Key::ResetHint) => "R reinicia contadores",
@@ -189,13 +198,13 @@ pub fn tr(lang: Lang, key: Key) -> &'static str {
             "A navegação é só por teclado; o mouse é a entrada sob teste.\n\
              1-5 escolhe o modo, TAB alterna, R reinicia, L abre o log.\n\
              F2 alterna pt-BR/en, F1 fecha esta ajuda, Q sai.\n\
-             A Fase 2 usa evdev; sem permissão, o mouse do terminal cobre o básico."
+             A Fase 3 usa evdev; sem permissão, o mouse do terminal cobre o básico."
         }
         (Lang::En, Key::HelpBody) => {
             "Navigation is keyboard-only; the mouse is the input under test.\n\
              1-5 selects a mode, TAB cycles, R resets, L opens the log.\n\
              F2 toggles pt-BR/en, F1 closes this help, Q quits.\n\
-             Phase 2 uses evdev; without permission, the terminal mouse covers the basics."
+             Phase 3 uses evdev; without permission, the terminal mouse covers the basics."
         }
         (Lang::PtBr, Key::TooSmall) => "Terminal pequeno: redimensione para pelo menos 60x20.",
         (Lang::En, Key::TooSmall) => "Terminal too small: resize to at least 60x20.",
@@ -237,6 +246,24 @@ pub fn tr(lang: Lang, key: Key) -> &'static str {
         (Lang::En, Key::BannerWaiting) => "Waiting for a readable mouse",
         (Lang::PtBr, Key::Histogram) => "Histograma",
         (Lang::En, Key::Histogram) => "Histogram",
+        (Lang::PtBr, Key::TargetsClick) => "Clique no alvo",
+        (Lang::En, Key::TargetsClick) => "Click the target",
+        (Lang::PtBr, Key::TargetsDrag) => "Pressione no alvo e arraste",
+        (Lang::En, Key::TargetsDrag) => "Press on the target and drag",
+        (Lang::PtBr, Key::TargetsDouble) => "Clique duas vezes no alvo",
+        (Lang::En, Key::TargetsDouble) => "Double-click the target",
+        (Lang::PtBr, Key::TargetsDone) => "Alvos concluídos",
+        (Lang::En, Key::TargetsDone) => "Targets complete",
+        (Lang::PtBr, Key::TargetsAccuracy) => "Acerto",
+        (Lang::En, Key::TargetsAccuracy) => "Accuracy",
+        (Lang::PtBr, Key::TargetsError) => "Erro",
+        (Lang::En, Key::TargetsError) => "Error",
+        (Lang::PtBr, Key::TargetsTime) => "Tempo",
+        (Lang::En, Key::TargetsTime) => "Time",
+        (Lang::PtBr, Key::TargetsHit) => "Acerto!",
+        (Lang::En, Key::TargetsHit) => "Hit!",
+        (Lang::PtBr, Key::TargetsMiss) => "Erro",
+        (Lang::En, Key::TargetsMiss) => "Miss",
     }
 }
 

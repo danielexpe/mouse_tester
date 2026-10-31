@@ -60,6 +60,11 @@ fn run(cli: Cli) -> Result<(), RunError> {
         return Ok(());
     }
 
+    if let Some(path) = &cli.capture_frame {
+        mousescope::render::capture::write_capture(path, cli.seed)?;
+        return Ok(());
+    }
+
     match cli.backend {
         BackendArg::Fb => Err(RunError::Backend(
             "the framebuffer backend is planned for Phase 4; use --backend tui".to_string(),
@@ -112,6 +117,7 @@ fn run_tui(cli: Cli) -> Result<(), RunError> {
         theme: Theme::new(cli.color_tier()),
         flags,
         initial_mode: cli.mode.mode(),
+        seed: cli.seed,
         demo_seed: if cli.demo { Some(cli.seed) } else { None },
         controller,
         grab: cli.grab,

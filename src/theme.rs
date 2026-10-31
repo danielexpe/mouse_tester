@@ -137,4 +137,55 @@ mod tests {
         assert_eq!(theme.accent, Color::White);
         assert_eq!(theme.bg, Color::Reset);
     }
+
+    fn rgb(color: Color) -> (f32, f32, f32) {
+        match color {
+            Color::Rgb(r, g, b) => (
+                f32::from(r) / 255.0,
+                f32::from(g) / 255.0,
+                f32::from(b) / 255.0,
+            ),
+            _ => (1.0, 1.0, 1.0),
+        }
+    }
+
+    fn luminance(color: Color) -> f32 {
+        let (r, g, b) = rgb(color);
+        let channel = |value: f32| {
+            if value <= 0.03928 {
+                value / 12.92
+            } else {
+                ((value + 0.055) / 1.055).powf(2.4)
+            }
+        };
+        0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b)
+    }
+
+    fn contrast(a: Color, b: Color) -> f32 {
+        let (high, low) = if luminance(a) > luminance(b) {
+            (luminance(a), luminance(b))
+        } else {
+            (luminance(b), luminance(a))
+        };
+        (high + 0.05) / (low + 0.05)
+    }
+
+    #[test]
+    fn truecolor_palette_meets_contrast_targets() {
+        let theme = Theme::default();
+        for color in [
+            theme.text,
+            theme.muted,
+            theme.accent,
+            theme.success,
+            theme.warning,
+            theme.danger,
+            theme.violet,
+            theme.pink,
+            theme.drag,
+        ] {
+            assert!(contrast(color, theme.surface) >= 4.5);
+            assert!(contrast(color, theme.bg) >= 4.5);
+        }
+    }
 }

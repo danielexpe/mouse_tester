@@ -50,3 +50,39 @@ fn version_is_available() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("mousescope"));
 }
+
+#[test]
+fn capture_frame_writes_png_without_tty() {
+    let path = std::env::temp_dir().join(format!(
+        "mousescope-capture-{}-{}.png",
+        std::process::id(),
+        std::thread::current().name().unwrap_or("test")
+    ));
+    let _ = std::fs::remove_file(&path);
+    let output = binary()
+        .arg("--capture-frame")
+        .arg(&path)
+        .arg("--seed")
+        .arg("42")
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let bytes = std::fs::read(&path).unwrap();
+    assert_eq!(
+        &bytes[..8],
+        &[0x89, b'P', b'N', b'G', 0x0d, 0x0a, 0x1a, 0x0a]
+    );
+    assert_eq!(u32::from_be_bytes(bytes[16..20].try_into().unwrap()), 1344);
+    assert_eq!(u32::from_be_bytes(bytes[20..24].try_into().unwrap()), 756);
+    let _ = std::fs::remove_file(&path);
+}
+
+#[test]
+fn capture_frame_invalid_path_exits_one() {
+    let output = binary()
+        .arg("--capture-frame")
+        .arg("/proc/mousescope/denied.png")
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(1));
+}

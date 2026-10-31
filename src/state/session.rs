@@ -5,7 +5,7 @@ use crate::core::device::{Capabilities, DeviceClass, DeviceId, DeviceInfo};
 use crate::core::effects::{Edge, Effects};
 use crate::core::geometry::Bounds;
 use crate::core::metrics::Metrics;
-use crate::core::modes::{ButtonsChallenge, ScrollChallenge};
+use crate::core::modes::{ButtonsChallenge, ScrollChallenge, TargetsChallenge};
 use crate::core::pointer::PointerState;
 use crate::core::scroll::{ScrollState, WheelFrame};
 use crate::input::{InputEvent, InputKind, InputSource};
@@ -61,6 +61,7 @@ pub struct Session {
     pub metrics: Metrics,
     pub buttons_challenge: ButtonsChallenge,
     pub scroll_challenge: ScrollChallenge,
+    pub targets: TargetsChallenge,
     pub devices: Vec<DeviceInfo>,
     pub primary: Option<DeviceId>,
     pub log: VecDeque<LogEntry>,
@@ -72,6 +73,10 @@ pub struct Session {
 
 impl Session {
     pub fn new(bounds: Bounds) -> Self {
+        Self::with_seed(bounds, 0)
+    }
+
+    pub fn with_seed(bounds: Bounds, seed: u64) -> Self {
         Self {
             mode: Mode::Dashboard,
             pointer: PointerState::new(bounds),
@@ -81,6 +86,7 @@ impl Session {
             metrics: Metrics::default(),
             buttons_challenge: ButtonsChallenge::new(&Capabilities::default()),
             scroll_challenge: ScrollChallenge::from_capabilities(None),
+            targets: TargetsChallenge::new(seed, bounds),
             devices: Vec::new(),
             primary: None,
             log: VecDeque::with_capacity(LOG_CAPACITY),
@@ -184,6 +190,18 @@ impl Session {
                     self.effects
                         .push(Effects::drag_release(drag, event.time_us));
                 }
+                if self.mode == Mode::Targets && *code == crate::core::codes::BTN_LEFT {
+                    if update.pressed {
+                        self.targets.observe_press(
+                            self.pointer.pos(),
+                            event.time_us,
+                            update.double_click,
+                        );
+                    } else {
+                        self.targets
+                            .observe_release(event.time_us, update.drag_released.as_ref());
+                    }
+                }
                 self.push_log(
                     event,
                     LogKind::Button {
@@ -249,6 +267,7 @@ impl Session {
         self.log.clear();
         self.overflow_events = 0;
         self.last_event_us = 0;
+        self.targets.restart();
         self.refresh_challenges();
     }
 

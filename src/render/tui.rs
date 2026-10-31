@@ -12,7 +12,7 @@ use crate::core::codes::{
 };
 use crate::core::effects::EffectKind;
 use crate::core::metrics::Confidence;
-use crate::core::modes::ScrollStep;
+use crate::core::modes::{ScrollStep, TargetKind, TargetResult};
 use crate::core::scroll::ScrollAxis;
 use crate::i18n::{tr, Key};
 use crate::render::layout::{compute, LayoutKind};
@@ -297,6 +297,78 @@ fn render_canvas(frame: &mut Frame, app: &App, area: Rect) {
                 });
             }
 
+            if app.session.mode == Mode::Targets {
+                let challenge = &app.session.targets;
+                if !challenge.is_done() {
+                    let target = challenge.target();
+                    let x = target.center.x as f64;
+                    let y = height - target.center.y as f64;
+                    let color = match target.kind {
+                        TargetKind::Click => theme.accent,
+                        TargetKind::Drag => theme.drag,
+                        TargetKind::DoubleClick => theme.warning,
+                    };
+                    ctx.draw(&Circle {
+                        x,
+                        y,
+                        radius: target.radius as f64,
+                        color,
+                    });
+                    if target.kind == TargetKind::DoubleClick {
+                        ctx.draw(&Circle {
+                            x,
+                            y,
+                            radius: target.radius as f64 * 0.62,
+                            color,
+                        });
+                    }
+                    let arm = target.radius as f64 * 1.25;
+                    ctx.draw(&CanvasLine {
+                        x1: x - arm,
+                        y1: y,
+                        x2: x - target.radius as f64 * 0.35,
+                        y2: y,
+                        color,
+                    });
+                    ctx.draw(&CanvasLine {
+                        x1: x + target.radius as f64 * 0.35,
+                        y1: y,
+                        x2: x + arm,
+                        y2: y,
+                        color,
+                    });
+                    ctx.draw(&CanvasLine {
+                        x1: x,
+                        y1: y - arm,
+                        x2: x,
+                        y2: y - target.radius as f64 * 0.35,
+                        color,
+                    });
+                    ctx.draw(&CanvasLine {
+                        x1: x,
+                        y1: y + target.radius as f64 * 0.35,
+                        x2: x,
+                        y2: y + arm,
+                        color,
+                    });
+                }
+                if challenge.result_visible(now) {
+                    if let Some(pos) = challenge.last_eval_pos() {
+                        let color = match challenge.last_result() {
+                            Some(TargetResult::Hit) => theme.success,
+                            Some(TargetResult::Miss) | None => theme.danger,
+                        };
+                        let radius = challenge.target().radius as f64 * 1.35;
+                        ctx.draw(&Circle {
+                            x: pos.x as f64,
+                            y: height - pos.y as f64,
+                            radius,
+                            color,
+                        });
+                    }
+                }
+            }
+
             if !no_trail {
                 let trail: Vec<(f64, f64)> = app
                     .session
@@ -487,6 +559,7 @@ fn render_buttons(frame: &mut Frame, app: &App, area: Rect) {
 
 fn render_motion(frame: &mut Frame, app: &App, area: Rect) {
     let theme = app.theme;
+    let now = app.now_us;
     let pointer = &app.session.pointer;
     let (raw_x, raw_y) = pointer.raw_total();
     let last_axis = app
@@ -500,6 +573,53 @@ fn render_motion(frame: &mut Frame, app: &App, area: Rect) {
         .unwrap_or("-");
 
     let mut lines = Vec::new();
+    if app.session.mode == Mode::Targets {
+        let challenge = &app.session.targets;
+        lines.push(TextLine::from(format!(
+            "{} {}/{}",
+            tr(app.lang, Key::Targets),
+            challenge.round(),
+            challenge.total()
+        )));
+        if challenge.is_done() {
+            lines.push(TextLine::from(tr(app.lang, Key::TargetsDone)));
+        } else {
+            let prompt = match challenge.kind() {
+                TargetKind::Click => tr(app.lang, Key::TargetsClick),
+                TargetKind::Drag => tr(app.lang, Key::TargetsDrag),
+                TargetKind::DoubleClick => tr(app.lang, Key::TargetsDouble),
+            };
+            lines.push(TextLine::from(prompt));
+        }
+        if challenge.result_visible(now) {
+            let feedback = match challenge.last_result() {
+                Some(TargetResult::Hit) => tr(app.lang, Key::TargetsHit),
+                Some(TargetResult::Miss) | None => tr(app.lang, Key::TargetsMiss),
+            };
+            lines.push(TextLine::from(feedback));
+        }
+        lines.push(TextLine::from(format!(
+            "{} {:.0}%  {} {}/{}",
+            tr(app.lang, Key::TargetsAccuracy),
+            challenge.accuracy() * 100.0,
+            tr(app.lang, Key::TargetsError),
+            challenge.misses(),
+            challenge.hits() + challenge.misses()
+        )));
+        let error = challenge
+            .last_error()
+            .map(|error| format!("{error:.1}"))
+            .unwrap_or_else(|| tr(app.lang, Key::NotAvailable).to_string());
+        let time = challenge
+            .last_duration_us()
+            .map(|duration| format!("{:.0} ms", duration as f64 / 1000.0))
+            .unwrap_or_else(|| tr(app.lang, Key::NotAvailable).to_string());
+        lines.push(TextLine::from(format!(
+            "{} {error}  {} {time}",
+            tr(app.lang, Key::TargetsError),
+            tr(app.lang, Key::TargetsTime)
+        )));
+    }
     if app.session.mode == Mode::Scroll {
         let (done, total) = app.session.scroll_challenge.progress();
         lines.push(TextLine::from(format!(
@@ -792,6 +912,7 @@ mod tests {
             theme: Theme::default(),
             flags: UiFlags::default(),
             initial_mode: Mode::Dashboard,
+            seed: 1,
             demo_seed: Some(1),
             controller: None,
             grab: false,

@@ -75,8 +75,8 @@ Evidência: `cargo test` = 74 unitários + 4 integração; smoke em `script` PTY
 
 ## 5. Fase 2 — TUI funcional com evdev
 
-**Status:** implementada; leitura evdev validada em hardware; critérios parciais
-pendentes.
+**Status:** implementada; leitura evdev, extras, scroll hi-res e hotplug
+validados em hardware.
 
 Objetivo: o produto principal funcionando no terminal.
 
@@ -103,9 +103,9 @@ Entregáveis:
 Critérios de saída:
 
 - [x] Fluxo básico com mouse real na TUI (mouse HID 1bcf:08a0, fonte `evdev`, terminal GNOME).
-- [ ] Botões advertising e extras (pendente de hardware).
-- [ ] Scroll vertical/horizontal e hi-res sem dupla contagem (parser testado; hardware pendente).
-- [ ] Hotplug ≤ 2 s (implementado; hardware pendente).
+- [x] Botões advertising e extras (validado pelo usuário).
+- [x] Scroll vertical/horizontal e hi-res sem dupla contagem (validado pelo usuário).
+- [x] Hotplug ≤ 2 s (validado pelo usuário).
 - [x] Degradado sem evdev, sem travar (validado em PTY).
 - [ ] Snapshots de todas as telas/idiomas/layouts (há testes de render, sem suíte de snapshots completa).
 - [ ] Restauração em saída normal, `Ctrl+C` e SIGTERM (normal e `Ctrl+C` cobertos; SIGTERM pendente).
@@ -115,12 +115,14 @@ Evidência: 115 unitários + 5 de integração; descoberta real lista
 `/dev/input/event3` como mouse `denied`; TUI degradada validada em PTY 120×36 e
 80×24, inclusive clique L via protocolo SGR; `--diagnostics` gerado;
 `--require-evdev` retorna 4. Leitura evdev validada com o mouse HID
-`1bcf:08a0` (fonte `evdev`) em terminal GNOME; extras, scroll hi-res e hotplug
-seguem pendentes de exercício ponta a ponta.
+`1bcf:08a0` (fonte `evdev`) em terminal GNOME. O usuário validou extras, scroll
+hi-res/horizontal e hotplug em hardware; snapshots completos e SIGTERM seguem
+pendentes.
 
 ## 6. Fase 3 — Modos ricos, acessibilidade e captura
 
-**Status:** próxima, após validar evdev real.
+**Status:** implementada; testada manualmente; performance de TUI ainda não
+medida.
 
 Objetivo: completar a experiência e o QA visual.
 
@@ -136,11 +138,16 @@ Entregáveis:
 
 Critérios de saída:
 
-- [ ] Modos ricos funcionam com seed reproduzível.
-- [ ] Captura PNG determinística e usada em docs/testes.
-- [ ] Acessibilidade mínima verificada.
-- [ ] Nenhuma regressão nos snapshots de TUI.
+- [x] Modos ricos funcionam com seed reproduzível (testes de domínio).
+- [x] Captura PNG determinística e usada em testes.
+- [x] Acessibilidade mínima verificada (contraste dos tokens e snapshot mono).
+- [x] Nenhuma regressão nos snapshots de TUI (Wide/Normal, pt-BR/en, mono, degradado).
 - [ ] Performance dentro do orçamento na TUI.
+
+Evidência: `core/modes/targets.rs` cobre clique, arraste e duplo clique com
+`--seed`; `--capture-frame` gera PNG 1344×756 determinístico sem TTY/evdev;
+`tests/snapshots.rs` compara texto; teste de contraste valida ≥ 4,5:1 para os
+tokens de texto sobre `surface`/`bg`.
 
 ## 7. Fase 4 — Framebuffer
 
