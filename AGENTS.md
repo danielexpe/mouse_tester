@@ -19,7 +19,7 @@ Data de referência: **2026-10-31**.
 | 2 — TUI funcional | implementada; evdev e extras validados | mouse HID 1bcf:08a0; scroll hi-res/hotplug ok; snapshots parciais |
 | 3 — Modos ricos | implementada; testada manualmente | performance da TUI ainda não medida |
 | 4 — Framebuffer | implementada e validada em VT | tty3, 1920×1080 32 bpp; 24/16 bpp pendentes |
-| 5 — Release | pendente | pacote, instalador, diagnóstico, matriz manual |
+| 5 — Release | em andamento; pacote 1.0.0 | licenças, instalador, pacote, matriz manual |
 | 6 — Backlog | pendente | DRM/KMS, hidraw, exportação, touchpad |
 
 As Fases 1, 2 e 3 foram implementadas. A TUI abre e fecha via PTY; a entrada
@@ -155,6 +155,7 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Fase 4 implementada: `platform/fb.rs` (validação, mmap, 32/24/16 bpp, pan/fallback, KD_GRAPHICS, blank, console), `render/fb.rs` com rasterizador/fonte 5×7, sinais, `--fb-device`, `testes_debug.sh` com preflight fb opcional (`--with-fb`). 164 testes sem hardware verdes; validação em VT real pendente. | `src/platform/fb.rs`, `src/platform/signals.rs`, `src/render/fb.rs`, `src/render/raster.rs`, `src/main.rs`, `src/cli.rs`, `testes_debug.sh`, docs |
 | 2026-10-31 | Fase 4 validada pelo usuário em `tty3` (Zorin OS 18.1, 1920×1080 32 bpp). Corrigidos eixo Y invertido no fb e detecção de VT (`ttyname` genérico + `/sys/class/tty/tty0/active`). `testes_debug.sh` passou a ter preflight fb opcional (`--with-fb`) e `timeout -k`. 164 testes. Pendentes: 24/16 bpp em hardware, sinais/pânico do fb e performance da TUI. | `src/render/fb.rs`, `src/platform/fb.rs`, `testes_debug.sh`, docs |
 | 2026-10-31 | Nome final ajustado para `mouse_tester`/`Mouse Tester` em pacote, binário, UI, docs, testes, snapshots e captura. Criado repositório público `danielexpe/mouse_tester`; `origin` aponta para ele e o antigo template fica como `template`. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, `testes_debug.sh`, docs |
+| 2026-10-31 | Fase 5 preparada: versão 1.0.0, `LICENSE` MIT, `THIRD_PARTY_NOTICES.md` + `licenses/`, `install.sh` com `--add-input-group`/`--skip-groups`, `scripts/package.sh`, `RELEASE_NOTES.md` e matriz manual. Pacote `mouse_tester-1.0.0-linux-x86_64.tar.gz` gerado e testado em `/tmp`. | `Cargo.toml`, `Cargo.lock`, `LICENSE`, `THIRD_PARTY_NOTICES.md`, `licenses/`, `install.sh`, `scripts/package.sh`, `RELEASE_NOTES.md`, `docs/11-manual-matrix.md` |
 
 ## 11. Fases
 

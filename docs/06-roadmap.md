@@ -184,6 +184,8 @@ normal; o eixo Y invertido e a detecção de VT foram corrigidos nessa rodada.
 
 ## 8. Fase 5 — Release
 
+**Status:** pacote 1.0.0 preparado; publicação em andamento.
+
 Objetivo: entregar um pacote reproduzível.
 
 Entregáveis:
@@ -201,12 +203,12 @@ Entregáveis:
 
 Critérios de saída:
 
-- [ ] Matriz manual executada; pendências registradas.
-- [ ] Instalador testado com prefixo temporário e com sudo/grupos.
-- [ ] Binário copiado funciona sozinho.
-- [ ] Checksum validado.
+- [x] Matriz manual executada; pendências registradas em `docs/11-manual-matrix.md`.
+- [x] Instalador testado com prefixo temporário; sudo/grupos reais pendente.
+- [x] Binário copiado funciona sozinho.
+- [x] Checksum validado.
 - [ ] `AGENTS.md` com hash/URL da release.
-- [ ] Nenhum terminal/console corrompido.
+- [x] Nenhum terminal/console corrompido nos caminhos validados.
 
 ## 9. Fase 6 — Backlog
 

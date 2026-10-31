@@ -1,4 +1,4 @@
-Mouse Tester  v0.1.0  Phase 3  Targets                                                              
+Mouse Tester  v1.0.0  Phase 3  Targets                                                              
 Device: No device  |  Source: evdev  |  Backend: TUI                                                
 Phase 3: targets, drag and double-click                                                             
 ┌ Motion ──────────────────────────────────────────────────────────────┐┌ Buttons ─────────────────┐

@@ -1,9 +1,9 @@
 # Mouse Tester
 
-> **Status: Fase 4 implementada e validada em VT.** A TUI lê evdev quando há
-> permissão, descobre dispositivos, faz hotplug, oferece fallback degradado,
-> desafios, Alvos e captura PNG. O backend framebuffer foi validado em VT
-> local 1920×1080 32 bpp.
+> **Status: 1.0.0 — release estável.** A TUI lê evdev quando há permissão,
+> descobre dispositivos, faz hotplug, oferece fallback degradado, desafios,
+> Alvos e captura PNG. O backend framebuffer foi validado em VT local
+> 1920×1080 32 bpp.
 >
 > Nome e binário: **Mouse Tester** (`mouse_tester`). Q-001 resolvida em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
@@ -24,7 +24,7 @@ relativo real, códigos de botão, wheel de alta resolução e timestamps do ker
 A TUI pode cair para eventos de mouse do terminal (`crossterm`) quando não há
 permissão de evdev, com limitações explicitamente sinalizadas.
 
-## Estado atual (Fase 4)
+## Estado atual (1.0.0)
 
 Implementado:
 
@@ -129,7 +129,27 @@ modos 2 e 3; o modo Alvos (clique, arraste e duplo clique) é o modo 5.
   permissão (tipicamente grupo `video`). O fb só é usado com `--backend fb`.
 - Sem rede, sem telemetria, sem fontes online.
 
-## Instalação planejada
+## Instalação
+
+Baixe `mouse_tester-1.0.0-linux-x86_64.tar.gz` e valide o checksum:
+
+```bash
+sha256sum -c mouse_tester-1.0.0-linux-x86_64.tar.gz.sha256
+tar -xzf mouse_tester-1.0.0-linux-x86_64.tar.gz
+cd mouse_tester-1.0.0-linux-x86_64
+./install.sh --prefix "$HOME/.local"
+```
+
+O instalador copia o binário, `README`, `LICENSE`, avisos de terceiros, docs e
+`testes_debug.sh`. Por padrão ele só **instrui** sobre o grupo `input`;
+`--add-input-group` tenta executar `usermod` com aviso de segurança. Use
+`--skip-groups` para não mostrar instruções. O app nunca deve ser executado como
+root.
+
+Para instalar em `/usr/local`, use `sudo ./install.sh`; para um prefixo
+temporário, `PREFIX=/tmp/mouse_tester ./install.sh --skip-groups`.
+
+Comandos:
 
 ```text
 mouse_tester                          # TUI, evdev ou fallback
@@ -138,11 +158,6 @@ mouse_tester --list-devices           # lista pontos de entrada
 mouse_tester --diagnostics diag.txt   # ambiente, permissões e capacidades
 mouse_tester --capture-frame qa.png   # PNG determinístico de QA
 ```
-
-O pacote futuro incluirá binário, `README`, licenças, `install.sh` e
-`testes_debug.sh`. O instalador nunca roda o app como root e avisa sobre o
-impacto de segurança de entrar no grupo `input` (qualquer processo desse grupo
-pode ler teclado).
 
 ## Índice de especificações
 
@@ -158,6 +173,7 @@ pode ler teclado).
 | [`docs/08-i18n-catalog.md`](docs/08-i18n-catalog.md) | catálogo de strings pt-BR/en |
 | [`docs/09-input-spec.md`](docs/09-input-spec.md) | especificação detalhada de evdev e fallback |
 | [`docs/10-release-checklist.md`](docs/10-release-checklist.md) | checklist de release |
+| [`docs/11-manual-matrix.md`](docs/11-manual-matrix.md) | matriz manual da release 1.0.0 |
 | [`AGENTS.md`](AGENTS.md) | memória operacional para agentes |
 
 ## Decisões principais
@@ -192,9 +208,10 @@ pode ler teclado).
   packing, mas ainda não foram exercitados em hardware.
 - Não altera configurações do mouse (DPI, polling, RGB, macros).
 
-## Licenças planejadas
+## Licenças
 
-- Código: MIT.
-- Arte original e efeitos: CC BY 4.0.
-- Fonte embutida: JetBrains Mono, OFL 1.1.
-- Avisos de terceiros em `THIRD_PARTY_NOTICES.md` na implementação.
+- Código: MIT (`LICENSE`).
+- Efeitos e arte procedural: parte do código MIT; sem assets bitmap.
+- Sem fonte externa embutida: fonte 5×7 interna (D-016), portanto OFL não se
+  aplica.
+- Crates de terceiros: `THIRD_PARTY_NOTICES.md` e textos em `licenses/`.

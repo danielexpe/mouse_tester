@@ -1,4 +1,4 @@
-Mouse Tester  v0.1.0  Fase 3  Painel                                                                                    
+Mouse Tester  v1.0.0  Fase 3  Painel                                                                                    
 Dispositivo: Nenhum dispositivo  |  Fonte: tui-mouse  |  Backend: TUI                                                   
 Modo degradado: mouse do terminal                                                                                       
 ┌ Movimento ─────────────────────────────────────────────────────────────────────────┐┌ Botões ────────────────────────┐
