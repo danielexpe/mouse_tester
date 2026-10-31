@@ -347,7 +347,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mousescope"
+name = "mouse_test"
 version = "0.1.0"
 dependencies = [
  "clap",

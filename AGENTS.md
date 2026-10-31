@@ -33,7 +33,7 @@ framebuffer ainda não existe.
 
 ## 3. Resumo do produto
 
-**MouseScope** é um teste visual de mouse para console Linux. Lê eventos de
+**Mouse Test** é um teste visual de mouse para console Linux. Lê eventos de
 mouse via evdev e representa movimento, botões, scroll, botões extras, arraste e
 taxa de relatório com efeitos em uma TUI (`ratatui`) ou no framebuffer
 (`/dev/fb0`). O mouse é o objeto do teste; a UI é navegada apenas por teclado.
@@ -84,7 +84,7 @@ Não reabrir sem pedido explícito do usuário; mudanças exigem novo ADR.
 
 | ID | Questão | Default proposto | Prazo |
 | --- | --- | --- | --- |
-| Q-001 | Confirmar nome/binary `MouseScope`/`mousescope`. | em uso; confirmar antes da release | antes da Fase 5 |
+| Q-001 | Confirmar nome/binary `Mouse Test`/`mouse_test`. | resolvida: `Mouse Test`/`mouse_test` | antes da Fase 5 |
 | Q-002 | Distribuição pessoal ou release pública? | release pública | antes da Fase 5 |
 | Q-003 | Instalador deve adicionar o usuário ao grupo `input`? | apenas instruir; flag opcional | antes da Fase 5 |
 | Q-004 | Hardware/distro alvo para validar fbdev? | resolvida: Zorin OS 18.1 / base Ubuntu, VT 1920×1080 32 bpp | antes da Fase 4 |
@@ -147,6 +147,7 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Leitura evdev validada em hardware com mouse HID `1bcf:08a0` (fonte `evdev`) em terminal GNOME. Modo degradado segue validado em PTY; extras/hotplug/snapshots pendentes. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-input-spec.md` |
 | 2026-10-31 | Fase 3 implementada: modo Alvos (clique/arraste/duplo clique, seed, métricas), captura PNG determinística 1344×756 sem dependências, snapshots de TUI, snapshot de captura e teste de contraste. 144 testes. Performance de TUI ainda não medida. | `src/core/modes/targets.rs`, `src/render/capture.rs`, `src/state/session.rs`, `src/render/tui.rs`, `tests/snapshots.rs`, docs |
 | 2026-10-31 | Validação manual do usuário: botões extras, scroll hi-res/horizontal e hotplug OK; modo Alvos e captura testados. Q-004 respondida: Zorin OS 18.1 (base Ubuntu noble), VT `tty2`, `/dev/fb0` 1920×1080 32 bpp; alvo: distros base Ubuntu. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` |
+| 2026-10-31 | Q-001 resolvida: pacote/binário renomeados para `mouse_test` e UI para `Mouse Test` em código, docs, testes, snapshots e captura. `rodar.sh` removido do Git e mantido local. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, docs |
 
 ## 11. Fases
 
@@ -170,5 +171,5 @@ declarar validação manual sem execução registrada.
   evdev, usar `newgrp input`/`sg input`. O usuário validou em sessão própria.
 - VT Linux não recebe mouse sem evdev; o suporte completo a console depende do
   backend framebuffer da Fase 4.
-- Q-001..Q-008 continuam em aberto; os defaults estão em uso.
+- Q-002, Q-003 e Q-005..Q-008 continuam em aberto; Q-001, Q-004 resolvidas.
 - Definir hardware/distro de validação (Q-004) antes da Fase 4.

@@ -2,7 +2,7 @@
 
 ## 1. Visão
 
-MouseScope é um **laboratório visual de mouse** para console Linux. Cada ação
+Mouse Test é um **laboratório visual de mouse** para console Linux. Cada ação
 física do mouse vira um efeito gráfico imediato e legível. O usuário consegue
 verificar em segundos se movimento, botões, scroll, botões laterais e taxa de
 relatório estão funcionando, sem instalar driver, abrir navegador ou depender de
@@ -58,7 +58,7 @@ O aplicativo tem dois modos de saída, com o mesmo estado e o mesmo domínio:
 
 ### 6.1 Primeiro uso na TUI
 
-1. Usuário executa `mousescope`.
+1. Usuário executa `mouse_test`.
 2. O app descobre dispositivos, abre o primeiro mouse compatível e mostra o
    dashboard.
 3. Ao mover o mouse, o cursor virtual e o rastro respondem.
@@ -78,7 +78,7 @@ O aplicativo tem dois modos de saída, com o mesmo estado e o mesmo domínio:
 
 ### 6.3 Framebuffer
 
-1. Usuário muda para um VT de texto e executa `mousescope --backend fb`.
+1. Usuário muda para um VT de texto e executa `mouse_test --backend fb`.
 2. O app valida `/dev/fb0`, VT ativo, permissões, `yoffset`, `smem_len` e
    formato.
 3. Entra em `KD_GRAPHICS`, desbloqueia o console com `FBIOBLANK`, desenha o

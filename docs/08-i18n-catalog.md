@@ -35,7 +35,7 @@
 
 | Chave | pt-BR | en |
 | --- | --- | --- |
-| `app.title` | MouseScope | MouseScope |
+| `app.title` | Mouse Test | Mouse Test |
 | `app.subtitle` | Laboratório visual de mouse | Visual mouse lab |
 | `backend.tui` | TUI | TUI |
 | `backend.fb` | Framebuffer | Framebuffer |
@@ -247,9 +247,9 @@ Rótulos curtos no canvas: `[L]`, `[R]`, `[M]`, `[S1]`, `[S2]`, `[F]`, `[B]`,
 
 | Chave | pt-BR | en |
 | --- | --- | --- |
-| `capture.title` | MouseScope — captura | MouseScope — capture |
+| `capture.title` | Mouse Test — captura | Mouse Test — capture |
 | `capture.note` | Estado sintético | Synthetic state |
-| `diag.title` | MouseScope — diagnóstico | MouseScope — diagnostics |
+| `diag.title` | Mouse Test — diagnóstico | Mouse Test — diagnostics |
 | `diag.permissions` | Permissões | Permissions |
 | `diag.environment` | Ambiente | Environment |
 | `diag.framebuffer` | Framebuffer | Framebuffer |

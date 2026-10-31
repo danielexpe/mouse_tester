@@ -104,7 +104,7 @@ Regras:
 
 | Componente | Licença | Obrigação |
 | --- | --- | --- |
-| Código do MouseScope | MIT | incluir `LICENSE` |
+| Código do Mouse Test | MIT | incluir `LICENSE` |
 | Efeitos e arte original | CC BY 4.0 | crédito ao projeto |
 | JetBrains Mono | OFL 1.1 | incluir `OFL.txt` e crédito |
 | Crates Rust | MIT/Apache-2.0 etc. | `THIRD_PARTY_NOTICES.md` |
@@ -122,7 +122,7 @@ Regras:
 Texto planejado para README/release:
 
 ```text
-MouseScope
+Mouse Test
 Código: MIT.
 Efeitos visuais e arte original: CC BY 4.0.
 Fonte JetBrains Mono: Copyright JetBrains, SIL Open Font License 1.1.

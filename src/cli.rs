@@ -81,7 +81,7 @@ impl ModeArg {
 
 #[derive(Clone, Debug, Parser)]
 #[command(
-    name = "mousescope",
+    name = "mouse_test",
     version,
     about = "Visual mouse tester for the Linux console"
 )]
@@ -165,7 +165,7 @@ mod tests {
 
     #[test]
     fn defaults_to_tui_dashboard() {
-        let cli = Cli::try_parse_from(["mousescope"]).unwrap();
+        let cli = Cli::try_parse_from(["mouse_test"]).unwrap();
         assert_eq!(cli.backend, BackendArg::Auto);
         assert_eq!(cli.mode, ModeArg::Dashboard);
         assert!(!cli.demo);
@@ -175,7 +175,7 @@ mod tests {
     #[test]
     fn parses_explicit_values() {
         let cli = Cli::try_parse_from([
-            "mousescope",
+            "mouse_test",
             "--backend",
             "fb",
             "--mode",
@@ -205,13 +205,13 @@ mod tests {
 
     #[test]
     fn accepts_pt_alias() {
-        let cli = Cli::try_parse_from(["mousescope", "--lang", "pt"]).unwrap();
+        let cli = Cli::try_parse_from(["mouse_test", "--lang", "pt"]).unwrap();
         assert_eq!(cli.language(), Lang::PtBr);
     }
 
     #[test]
     fn never_forces_mono() {
-        let cli = Cli::try_parse_from(["mousescope", "--color", "never"]).unwrap();
+        let cli = Cli::try_parse_from(["mouse_test", "--color", "never"]).unwrap();
         assert_eq!(cli.color_tier(), ColorTier::Mono);
     }
 }

@@ -12,7 +12,7 @@ pub fn write_report(path: &Path) -> io::Result<()> {
 
 pub fn render_report() -> String {
     let mut out = String::new();
-    let _ = writeln!(out, "mousescope diagnostics");
+    let _ = writeln!(out, "mouse_test diagnostics");
     let _ = writeln!(out, "version={}", env!("CARGO_PKG_VERSION"));
     let _ = writeln!(out, "backend=tui");
     let _ = writeln!(out, "session={}", env_or("XDG_SESSION_TYPE", "unknown"));
@@ -123,7 +123,7 @@ mod tests {
     #[test]
     fn report_has_expected_sections() {
         let report = render_report();
-        assert!(report.contains("mousescope diagnostics"));
+        assert!(report.contains("mouse_test diagnostics"));
         assert!(report.contains("version="));
         assert!(report.contains("input.devices="));
         assert!(report.contains("notes="));

@@ -8,13 +8,13 @@ use crossterm::event::{self, Event};
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 
-use mousescope::app::{App, AppConfig, UiFlags};
-use mousescope::cli::{BackendArg, Cli, TuiMouseArg};
-use mousescope::core::device::DeviceInfo;
-use mousescope::core::geometry::Bounds;
-use mousescope::input::{discover, InputController, InputError, Selection};
-use mousescope::platform::{install_panic_hook, set_mouse_capture, TuiGuard};
-use mousescope::theme::Theme;
+use mouse_test::app::{App, AppConfig, UiFlags};
+use mouse_test::cli::{BackendArg, Cli, TuiMouseArg};
+use mouse_test::core::device::DeviceInfo;
+use mouse_test::core::geometry::Bounds;
+use mouse_test::input::{discover, InputController, InputError, Selection};
+use mouse_test::platform::{install_panic_hook, set_mouse_capture, TuiGuard};
+use mouse_test::theme::Theme;
 
 #[derive(Debug, thiserror::Error)]
 enum RunError {
@@ -43,7 +43,7 @@ fn main() -> ExitCode {
     match run(cli) {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("mousescope: {error}");
+            eprintln!("mouse_test: {error}");
             ExitCode::from(error.exit_code())
         }
     }
@@ -56,12 +56,12 @@ fn run(cli: Cli) -> Result<(), RunError> {
     }
 
     if let Some(path) = &cli.diagnostics {
-        mousescope::diagnostics::write_report(path)?;
+        mouse_test::diagnostics::write_report(path)?;
         return Ok(());
     }
 
     if let Some(path) = &cli.capture_frame {
-        mousescope::render::capture::write_capture(path, cli.seed)?;
+        mouse_test::render::capture::write_capture(path, cli.seed)?;
         return Ok(());
     }
 
@@ -89,10 +89,10 @@ fn list_devices(all_devices: bool) -> Result<(), RunError> {
         );
     }
     if discovery.devices.is_empty() {
-        eprintln!("mousescope: no input devices found in /proc/bus/input/devices");
+        eprintln!("mouse_test: no input devices found in /proc/bus/input/devices");
     }
     for warning in &discovery.warnings {
-        eprintln!("mousescope: {warning}");
+        eprintln!("mouse_test: {warning}");
     }
     stdout().flush()?;
     Ok(())
@@ -137,7 +137,7 @@ fn run_tui(cli: Cli) -> Result<(), RunError> {
         }
 
         terminal
-            .draw(|frame| mousescope::render::render(frame, &app))
+            .draw(|frame| mouse_test::render::render(frame, &app))
             .map_err(RunError::Io)?;
 
         if app.quit {
@@ -154,7 +154,7 @@ fn run_tui(cli: Cli) -> Result<(), RunError> {
                 Event::Key(key) => app.handle_key(key),
                 Event::Mouse(mouse) if mouse_capture => {
                     let size = terminal.size()?;
-                    let events = mousescope::input::tui_mouse::map_mouse_event(
+                    let events = mouse_test::input::tui_mouse::map_mouse_event(
                         mouse,
                         size.width,
                         size.height,

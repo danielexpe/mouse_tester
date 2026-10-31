@@ -154,7 +154,7 @@ impl DeviceInfo {
         Self {
             id,
             path: PathBuf::from(format!("/dev/input/mock{id}")),
-            name: "MouseScope Mock Mouse".to_string(),
+            name: "Mouse Test Mock Mouse".to_string(),
             phys: Some("mock/0".to_string()),
             uniq: None,
             vendor: 0x1209,

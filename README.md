@@ -1,11 +1,11 @@
-# MouseScope
+# Mouse Test
 
 > **Status: Fase 3 implementada; evdev real validado.** A TUI lê evdev quando
 > há permissão, descobre dispositivos, faz hotplug, oferece fallback degradado,
 > desafios e modo Alvos. A captura PNG determinística já existe; framebuffer
 > ainda não.
 >
-> Nome provisório: **MouseScope** (`mousescope`). Veja a questão aberta Q-001 em
+> Nome e binário: **Mouse Test** (`mouse_test`). Q-001 resolvida em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
 
 Aplicativo Rust para console Linux que transforma cada ação de um mouse em
@@ -126,11 +126,11 @@ modos 2 e 3; o modo Alvos (clique, arraste e duplo clique) é o modo 5.
 ## Instalação planejada
 
 ```text
-mousescope                          # TUI, evdev ou fallback
-mousescope --backend fb             # console, exige VT e permissões
-mousescope --list-devices           # lista pontos de entrada
-mousescope --diagnostics diag.txt   # ambiente, permissões e capacidades
-mousescope --capture-frame qa.png   # PNG determinístico de QA
+mouse_test                          # TUI, evdev ou fallback
+mouse_test --backend fb             # console, exige VT e permissões
+mouse_test --list-devices           # lista pontos de entrada
+mouse_test --diagnostics diag.txt   # ambiente, permissões e capacidades
+mouse_test --capture-frame qa.png   # PNG determinístico de QA
 ```
 
 O pacote futuro incluirá binário, `README`, licenças, `install.sh` e

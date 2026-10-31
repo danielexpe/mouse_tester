@@ -319,7 +319,7 @@ Segue o framework, com adaptações:
 ## 10. CLI
 
 ```text
-mousescope [OPTIONS]
+mouse_test [OPTIONS]
 
   --backend <auto|tui|fb>          padrão: auto (TUI)
   --fb-device <PATH>               padrão: /dev/fb0

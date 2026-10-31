@@ -261,8 +261,8 @@ Registrar em `docs/06-roadmap.md` ou relatório de release; não inventar.
   - `/proc/bus/input/devices`, `/sys/class/input/*`;
   - `/proc/fb`, `/sys/class/graphics/fb*/*`, `fbset -i` (se existir);
   - `/dev/dri`, driver DRM, `dmesg` (se acessível);
-  - `mousescope --list-devices --all-devices`;
-  - `mousescope --diagnostics`;
+  - `mouse_test --list-devices --all-devices`;
+  - `mouse_test --diagnostics`;
   - execução com `timeout` e, quando possível, `strace -e ioctl,openat,read`;
   - restauração de `KD_TEXT`/cursor mesmo em erro.
 - O script não instala nada, não roda como root e avisa se não estiver em VT.

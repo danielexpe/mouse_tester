@@ -1,4 +1,4 @@
-MouseScope  v0.1.0  Fase 3  Alvos                                                                   
+Mouse Test  v0.1.0  Fase 3  Alvos                                                                   
 Dispositivo: Nenhum dispositivo  |  Fonte: evdev  |  Backend: TUI                                   
 Fase 3: alvos, arraste e duplo clique                                                               
 ┌ Movimento ───────────────────────────────────────────────────────────┐┌ Botões ──────────────────┐

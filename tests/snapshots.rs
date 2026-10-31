@@ -1,12 +1,12 @@
 use std::fs;
 use std::path::PathBuf;
 
-use mousescope::app::{App, AppConfig, UiFlags};
-use mousescope::core::geometry::Bounds;
-use mousescope::i18n::Lang;
-use mousescope::render::render;
-use mousescope::state::Mode;
-use mousescope::theme::{ColorTier, Theme};
+use mouse_test::app::{App, AppConfig, UiFlags};
+use mouse_test::core::geometry::Bounds;
+use mouse_test::i18n::Lang;
+use mouse_test::render::render;
+use mouse_test::state::Mode;
+use mouse_test::theme::{ColorTier, Theme};
 use ratatui::backend::TestBackend;
 use ratatui::Terminal;
 
@@ -114,7 +114,7 @@ fn fnv1a64(bytes: &[u8]) -> u64 {
 #[test]
 fn capture_png_matches_golden_hash() {
     let png =
-        mousescope::render::capture::encode_png(&mousescope::render::capture::render_capture(42));
+        mouse_test::render::capture::encode_png(&mouse_test::render::capture::render_capture(42));
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.push("tests");
     path.push("snapshots");

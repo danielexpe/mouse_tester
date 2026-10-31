@@ -163,7 +163,7 @@ pub fn render_capture(seed: u64) -> Frame {
 
     frame.fill_rect(40, 28, 1264, 76, SURFACE);
     frame.stroke_rect(40, 28, 1264, 76, BORDER);
-    frame.text(64, 44, "MOUSESCOPE", ACCENT, 5);
+    frame.text(64, 44, "MOUSE TEST", ACCENT, 5);
     frame.text(64, 82, "DETERMINISTIC CAPTURE 1344X756", MUTED, 2);
     frame.text(1130, 44, "PHASE 3", WARNING, 3);
     frame.text(1130, 76, "SEED", MUTED, 2);
@@ -435,7 +435,7 @@ mod tests {
 
     #[test]
     fn glyphs_cover_capture_text() {
-        let text = "MOUSESCOPE DETERMINISTIC CAPTURE 1344X756 PHASE 3 SEED MOTION DEVICE DEMO MOUSE SOURCE EVDEV";
+        let text = "MOUSE TEST DETERMINISTIC CAPTURE 1344X756 PHASE 3 SEED MOTION DEVICE DEMO MOUSE SOURCE EVDEV";
         for ch in text.chars().filter(|ch| !ch.is_whitespace()) {
             assert_ne!(glyph(ch), [0; 7], "missing glyph for {ch}");
         }
