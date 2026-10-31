@@ -80,12 +80,13 @@ TAB modo  T disp.  Q sair
 ## 3. Framebuffer
 
 - Tela inteira recebe fundo `Background`.
-- Canvas lógico **1344×756** (70% de 1920×1080), escalado por fator calculado a
-  partir de 70% do menor eixo e centralizado.
+- Canvas lógico **1344×756**, escalado ao espaço disponível preservando a
+  proporção e centralizado.
 - Caminho rápido 1:1 quando a escala é ≈ 1; bilinear para escala fracionária.
 - Cursor desenhado por software como última camada, com anel de contraste para
   qualquer fundo.
-- Texto com `fontdue::layout`, `line_height` consistente e alinhamento medido.
+- Texto com fonte 5×7 interna, `line_height` consistente e alinhamento medido
+  (D-016).
 - Alpha pré-multiplicado no blend.
 - Sem vsync; tearing leve aceitável.
 - Fundo estático (grade, painéis) pré-renderizado; apenas canvas e números
@@ -332,8 +333,8 @@ stderr após restaurar.
   - cursor deslocado, rastro, um anel de clique, scroll +3, botões L/R/M,
   - taxa 1000 Hz, jitter 42 µs, confiança alta.
 - Captura é usada em testes; nunca depende de hardware.
-- Na Fase 3 a captura usa pintor RGBA e fonte 5×7 embutidos; o render final
-  com `tiny-skia`/`fontdue` continua previsto para o framebuffer.
+- A captura e o framebuffer usam o mesmo pintor RGBA e fonte 5×7 embutidos
+  (D-016); `tiny-skia`/`fontdue` ficam no backlog.
 - Snapshots de TUI usam layout Wide e Normal, pt-BR e en, estados normal,
   degradado e sem dispositivo.
 - Versão no cabeçalho muda snapshots por release; revisar o diff é esperado.

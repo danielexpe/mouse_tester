@@ -89,6 +89,9 @@ pub struct Cli {
     #[arg(long, value_enum, default_value_t = BackendArg::Auto)]
     pub backend: BackendArg,
 
+    #[arg(long, value_name = "PATH", default_value = "/dev/fb0")]
+    pub fb_device: PathBuf,
+
     #[arg(long, value_enum, default_value_t = ModeArg::Dashboard)]
     pub mode: ModeArg,
 

@@ -35,7 +35,7 @@ Critérios de saída:
 
 - [x] Usuário aprova escopo e nome provisório.
 - [ ] Usuário confirma se quer release pública (Q-002; default: sim).
-- [ ] Usuário confirma hardware/distro alvo de fbdev (Q-004; default: VT local).
+- [x] Usuário confirma hardware/distro alvo de fbdev (Q-004; Zorin OS 18.1, VT 1920×1080 32 bpp).
 - [x] Nenhuma decisão congelada em conflito.
 - [x] Nenhum código escrito na Fase 0.
 
@@ -108,7 +108,7 @@ Critérios de saída:
 - [x] Hotplug ≤ 2 s (validado pelo usuário).
 - [x] Degradado sem evdev, sem travar (validado em PTY).
 - [ ] Snapshots de todas as telas/idiomas/layouts (há testes de render, sem suíte de snapshots completa).
-- [ ] Restauração em saída normal, `Ctrl+C` e SIGTERM (normal e `Ctrl+C` cobertos; SIGTERM pendente).
+- [x] Restauração em saída normal, `Ctrl+C` e SIGTERM (SIGTERM validado em PTY).
 - [x] Testes automatizados verdes com e sem features.
 
 Evidência: 115 unitários + 5 de integração; descoberta real lista
@@ -116,8 +116,7 @@ Evidência: 115 unitários + 5 de integração; descoberta real lista
 80×24, inclusive clique L via protocolo SGR; `--diagnostics` gerado;
 `--require-evdev` retorna 4. Leitura evdev validada com o mouse HID
 `1bcf:08a0` (fonte `evdev`) em terminal GNOME. O usuário validou extras, scroll
-hi-res/horizontal e hotplug em hardware; snapshots completos e SIGTERM seguem
-pendentes.
+hi-res/horizontal e hotplug em hardware; snapshots completos seguem pendentes.
 
 ## 6. Fase 3 — Modos ricos, acessibilidade e captura
 
@@ -151,13 +150,16 @@ tokens de texto sobre `surface`/`bg`.
 
 ## 7. Fase 4 — Framebuffer
 
+**Status:** implementada e validada em VT real (`tty3`, 1920×1080 32 bpp);
+24/16 bpp e caminhos de sinal/pânico do fb ainda pendentes.
+
 Objetivo: experiência idêntica em VT de texto.
 
 Entregáveis:
 
 - `platform/fb.rs`: validação, mmap, formatos 32/24/16, pan/fallback;
 - `render/fb.rs`: canvas, escala, blend, cursor software;
-- `render/text.rs`: `fontdue` + layout;
+- `render/fb.rs` + `render/raster.rs`: pintor RGBA e fonte 5×7 (D-016);
 - `KD_GRAPHICS`, `FBIOBLANK`, `KD_TEXT`, cursor;
 - sinais e panic hook;
 - teclado via crossterm em `/dev/tty`;
@@ -167,13 +169,18 @@ Entregáveis:
 
 Critérios de saída:
 
-- [ ] Primeiro frame sem `Ctrl+C`, inclusive console blanked.
-- [ ] 1920×1080 32 bpp validado em VT real.
-- [ ] 24/16 bpp validados ou explicitamente pendentes.
-- [ ] Pan e fallback testados.
-- [ ] Restauração em saída normal/erro/sinal/pânico.
-- [ ] `testes_debug.sh` gera relatório único.
+- [x] Primeiro frame sem `Ctrl+C`, inclusive console blanked.
+- [x] 1920×1080 32 bpp validado em VT real.
+- [ ] 24/16 bpp validados ou explicitamente pendentes (parse/packing testados).
+- [x] Pan e fallback testados em unidade.
+- [ ] Restauração em saída normal/erro/sinal/pânico (saída normal validada; sinais/pânico pendentes).
+- [x] `testes_debug.sh` gera relatório único (testado em VT pelo usuário).
 - [ ] Se não houver hardware: fase marcada **pendente**, não “concluída”.
+
+Evidência: testes de ABI 160/80, validação 32/24/16 bpp, packing, stride,
+pan/fallback, detecção de VT e frame 1920×1080 não vazio. Validação do usuário
+em `tty3` (Zorin OS 18.1, 1920×1080 32 bpp) com cursor, botões, modos e saída
+normal; o eixo Y invertido e a detecção de VT foram corrigidos nessa rodada.
 
 ## 8. Fase 5 — Release
 

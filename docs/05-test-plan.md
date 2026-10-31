@@ -165,29 +165,29 @@ Pirâmide:
 
 ## 7. Testes de framebuffer sem hardware
 
-- Parse de formato 32/24/16 e rejeição de desconhecido.
-- Tamanhos ABI: `fb_var_screeninfo` 160, `fb_fix_screeninfo` 80 (x86_64).
-- Empacotamento de pixel e escrita de linha com `line_length`/padding.
-- Conversão por bitfield para 32/24/16.
+- [x] Parse de formato 32/24/16 e rejeição de desconhecido.
+- [x] Tamanhos ABI: `fb_var_screeninfo` 160, `fb_fix_screeninfo` 80 (x86_64).
+- [x] Empacotamento de pixel e escrita de linha com `line_length`/padding.
+- [x] Conversão por bitfield para 32/24/16.
 - Geometria de canvas 70% em 1080p/1440p/768p.
 - Escala 1:1 e fracionária; bilinear não borra texto além do esperado.
 - Blend com alpha 0, opaco e parcial (RGBA pré-multiplicado).
-- Escolha de buffer de pan:
+- [x] Escolha de buffer de pan:
   - `current == 0 -> yres`;
   - `current == yres -> 0`;
   - `current` inesperado -> 0.
-- Validações:
+- [x] Validações:
   - `yoffset > yres_virtual - yres` ⇒ erro claro;
   - `line_length < xres * bytes_por_pixel` ⇒ erro;
   - `smem_len` insuficiente ⇒ erro/pan desabilitado conforme caso;
   - geometria virtual inconsistente ⇒ erro.
-- Plano de mapeamento:
+- [x] Plano de mapeamento:
   - sem pan: `(yoffset + yres)` linhas;
   - com pan: dois buffers + buffer visível de fallback.
-- Pan com memória só para um buffer é desabilitado, não fatal.
-- Falha de `FBIOPAN_DISPLAY` desabilita pan e continua.
+- [x] Pan com memória só para um buffer é desabilitado, não fatal.
+- [x] Falha de `FBIOPAN_DISPLAY` desabilita pan e continua (caminho implementado).
 - Cursor desenhado dentro/fora das bordas é clampado corretamente.
-- Frame não vazio e do tamanho esperado.
+- [x] Frame não vazio e do tamanho esperado.
 
 ## 8. Testes de captura e determinismo
 
@@ -255,7 +255,9 @@ Registrar em `docs/06-roadmap.md` ou relatório de release; não inventar.
 
 ## 10. Diagnóstico e bugs de hardware
 
-- `testes_debug.sh` deve gerar um único arquivo `testes_debug.txt` com:
+- `testes_debug.sh` gera um único arquivo `testes_debug.txt`; o preflight do fb
+  é opcional com `--with-fb` (5 s, `timeout -k`) para não prender o script.
+- Conteúdo:
   - versão, `os-release`, kernel, `id`, `loginctl`, `tty`, VT ativo;
   - grupos e permissões de `/dev/input/event*` e `/dev/fb*`;
   - `/proc/bus/input/devices`, `/sys/class/input/*`;
@@ -263,7 +265,7 @@ Registrar em `docs/06-roadmap.md` ou relatório de release; não inventar.
   - `/dev/dri`, driver DRM, `dmesg` (se acessível);
   - `mouse_test --list-devices --all-devices`;
   - `mouse_test --diagnostics`;
-  - execução com `timeout` e, quando possível, `strace -e ioctl,openat,read`;
+  - execução com `timeout -k` (opcional) e, quando possível, `strace`;
   - restauração de `KD_TEXT`/cursor mesmo em erro.
 - O script não instala nada, não roda como root e avisa se não estiver em VT.
 - Para bug de fb, coletar antes de mudar o código.
@@ -291,12 +293,12 @@ Adicionar verificação de MSRV quando o CI existir.
 - [ ] Unitários de domínio, parser e métricas verdes.
 - [x] Snapshots revisados (targets pt/en/mono e degradado).
 - [ ] PTY cobre entrada, saída e restauração.
-- [ ] Testes de fb sem hardware verdes.
+- [x] Testes de fb sem hardware verdes.
 - [ ] Captura determinística.
 - [ ] Matriz manual executada e registrada; itens não executados marcados como
       **pendentes** com motivo.
 - [ ] Nenhuma validação de hardware declarada sem evidência.
-- [ ] `testes_debug.sh` testado em VT.
+- [x] `testes_debug.sh` testado em VT.
 - [ ] Nenhum terminal/console corrompido.
 
 ## 13. Estado da Fase 2
@@ -316,4 +318,4 @@ Adicionar verificação de MSRV quando o CI existir.
 - [x] `--require-evdev` retorna 4; `--diagnostics` gera relatório.
 - [ ] Leitura real de eventos, botões extras, scroll hi-res e hotplug:
       pendentes de sessão com permissão em `/dev/input`.
-- [ ] fbdev: pendente (Fase 4).
+- [x] fbdev: testes sem hardware verdes; validação em VT pendente.

@@ -18,7 +18,7 @@ Data de referência: **2026-10-31**.
 | 1 — Fundação | concluída | crate, domínio puro, CLI, mock, TUI placeholder; 78 testes |
 | 2 — TUI funcional | implementada; evdev e extras validados | mouse HID 1bcf:08a0; scroll hi-res/hotplug ok; snapshots parciais |
 | 3 — Modos ricos | implementada; testada manualmente | performance da TUI ainda não medida |
-| 4 — Framebuffer | pendente | fbdev, cursor, sinais, validação em VT |
+| 4 — Framebuffer | implementada e validada em VT | tty3, 1920×1080 32 bpp; 24/16 bpp pendentes |
 | 5 — Release | pendente | pacote, instalador, diagnóstico, matriz manual |
 | 6 — Backlog | pendente | DRM/KMS, hidraw, exportação, touchpad |
 
@@ -29,7 +29,10 @@ e fallback `crossterm`. A leitura real foi validada com o mouse HID `1bcf:08a0`
 A Fase 3 adicionou o modo Alvos com seed, captura PNG determinística e snapshots
 de texto. O usuário validou extras, scroll hi-res/horizontal e hotplug em
 hardware e testou a Fase 3; a performance da TUI ainda não foi medida.
-framebuffer ainda não existe.
+A Fase 4 adicionou o backend framebuffer, console KD_GRAPHICS, pan/fallback,
+sinais e `testes_debug.sh`; o usuário validou o backend em VT real (`tty3`,
+1920×1080 32 bpp). Durante a validação foram corrigidos o eixo Y invertido e um
+falso negativo na detecção de VT.
 
 ## 3. Resumo do produto
 
@@ -39,9 +42,9 @@ taxa de relatório com efeitos em uma TUI (`ratatui`) ou no framebuffer
 (`/dev/fb0`). O mouse é o objeto do teste; a UI é navegada apenas por teclado.
 A TUI é o backend padrão; o framebuffer é explícito.
 
-Estado atual: Fase 3 implementada com domínio puro, CLI, evdev, fallback,
-desafios, Alvos, captura PNG, seletor de dispositivo e diagnóstico textual.
-`--demo` continua disponível para inspeção sem hardware.
+Estado atual: Fase 4 implementada com domínio puro, CLI, evdev, fallback,
+desafios, Alvos, captura PNG, seletor de dispositivo, diagnóstico textual e
+backend framebuffer validado em VT. `--demo` continua disponível.
 
 ## 4. Decisões congeladas
 
@@ -57,13 +60,14 @@ Não reabrir sem pedido explícito do usuário; mudanças exigem novo ADR.
 | D-006 | Sem `EVIOCGRAB` por padrão; grab opt-in e bloqueado em dispositivo combo. |
 | D-007 | `--backend auto` escolhe TUI; fb só com flag explícita. |
 | D-008 | Sem áudio na v1; sem rede, telemetria ou persistência. |
-| D-009 | Sem `ratatui-image`; canvas Braille na TUI e `tiny-skia` no fb. |
+| D-009 | Sem `ratatui-image`; canvas Braille na TUI. Render do fb substituído por D-016. |
 | D-010 | Hotplug por varredura periódica, não `inotify` na v1. |
 | D-011 | Docs em pt-BR; código/CLI em inglês; UI em pt-BR e en. |
 | D-012 | Taxa de relatório é estimativa; o app não afirma DPI nem polling nominal. |
 | D-013 | Diagnóstico em texto simples; sem `serde` na v1. |
 | D-014 | Nunca rodar como root; permissões via grupos `input`/`video` documentadas. |
 | D-015 | Framebuffer é entregue na Fase 4; se não houver hardware, fica pendente. |
+| D-016 | Rasterizador interno e fonte 5×7 no fb; sem `tiny-skia`/`fontdue` na v1. |
 
 ## 5. Fontes de verdade
 
@@ -87,7 +91,7 @@ Não reabrir sem pedido explícito do usuário; mudanças exigem novo ADR.
 | Q-001 | Confirmar nome/binary `Mouse Test`/`mouse_test`. | resolvida: `Mouse Test`/`mouse_test` | antes da Fase 5 |
 | Q-002 | Distribuição pessoal ou release pública? | release pública | antes da Fase 5 |
 | Q-003 | Instalador deve adicionar o usuário ao grupo `input`? | apenas instruir; flag opcional | antes da Fase 5 |
-| Q-004 | Hardware/distro alvo para validar fbdev? | resolvida: Zorin OS 18.1 / base Ubuntu, VT 1920×1080 32 bpp | antes da Fase 4 |
+| Q-004 | Hardware/distro alvo para validar fbdev? | resolvida: Zorin OS 18.1 / base Ubuntu, VT `tty3` 1920×1080 32 bpp | antes da Fase 4 |
 | Q-005 | Touchpad na v1? | apenas seleção explícita, básico | antes da Fase 3 |
 | Q-006 | Exportar métricas de sessão? | backlog (CSV/JSON) | Fase 6 |
 | Q-007 | Medir DPI com deslocamento físico? | backlog | Fase 6 |
@@ -148,6 +152,8 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Fase 3 implementada: modo Alvos (clique/arraste/duplo clique, seed, métricas), captura PNG determinística 1344×756 sem dependências, snapshots de TUI, snapshot de captura e teste de contraste. 144 testes. Performance de TUI ainda não medida. | `src/core/modes/targets.rs`, `src/render/capture.rs`, `src/state/session.rs`, `src/render/tui.rs`, `tests/snapshots.rs`, docs |
 | 2026-10-31 | Validação manual do usuário: botões extras, scroll hi-res/horizontal e hotplug OK; modo Alvos e captura testados. Q-004 respondida: Zorin OS 18.1 (base Ubuntu noble), VT `tty2`, `/dev/fb0` 1920×1080 32 bpp; alvo: distros base Ubuntu. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` |
 | 2026-10-31 | Q-001 resolvida: pacote/binário renomeados para `mouse_test` e UI para `Mouse Test` em código, docs, testes, snapshots e captura. `rodar.sh` removido do Git e mantido local. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, docs |
+| 2026-10-31 | Fase 4 implementada: `platform/fb.rs` (validação, mmap, 32/24/16 bpp, pan/fallback, KD_GRAPHICS, blank, console), `render/fb.rs` com rasterizador/fonte 5×7, sinais, `--fb-device`, `testes_debug.sh` com preflight fb opcional (`--with-fb`). 164 testes sem hardware verdes; validação em VT real pendente. | `src/platform/fb.rs`, `src/platform/signals.rs`, `src/render/fb.rs`, `src/render/raster.rs`, `src/main.rs`, `src/cli.rs`, `testes_debug.sh`, docs |
+| 2026-10-31 | Fase 4 validada pelo usuário em `tty3` (Zorin OS 18.1, 1920×1080 32 bpp). Corrigidos eixo Y invertido no fb e detecção de VT (`ttyname` genérico + `/sys/class/tty/tty0/active`). `testes_debug.sh` passou a ter preflight fb opcional (`--with-fb`) e `timeout -k`. 164 testes. Pendentes: 24/16 bpp em hardware, sinais/pânico do fb e performance da TUI. | `src/render/fb.rs`, `src/platform/fb.rs`, `testes_debug.sh`, docs |
 
 ## 11. Fases
 
@@ -165,11 +171,13 @@ declarar validação manual sem execução registrada.
 
 - Fases 2 e 3 implementadas; evdev validado com mouse HID `1bcf:08a0`
   (fonte `evdev`) em terminal GNOME.
-- Próximo passo: Fase 4 (framebuffer), após definir hardware/distro (Q-004).
-- Pendências da Fase 2/3: matriz completa de snapshots e performance medida.
+- Próximo passo: Fase 5 (release), decidindo Q-002 (pública/pessoal) e Q-003
+  (instalador e grupo `input`).
+- Pendências: 24/16 bpp do fb em hardware, sinais/pânico do fb, matriz completa
+  de snapshots e performance da TUI.
 - A sessão do agente continua fora do grupo `input`; para reproduzir testes
   evdev, usar `newgrp input`/`sg input`. O usuário validou em sessão própria.
 - VT Linux não recebe mouse sem evdev; o suporte completo a console depende do
   backend framebuffer da Fase 4.
 - Q-002, Q-003 e Q-005..Q-008 continuam em aberto; Q-001, Q-004 resolvidas.
-- Definir hardware/distro de validação (Q-004) antes da Fase 4.
+- Q-004 resolvida: Zorin OS 18.1 (base Ubuntu), `tty3`, 1920×1080 32 bpp.

@@ -4,3 +4,5 @@
 *.sha256
 
 /rodar.sh
+
+/testes_debug.txt

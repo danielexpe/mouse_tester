@@ -1,9 +1,9 @@
 # Mouse Test
 
-> **Status: Fase 3 implementada; evdev real validado.** A TUI lê evdev quando
-> há permissão, descobre dispositivos, faz hotplug, oferece fallback degradado,
-> desafios e modo Alvos. A captura PNG determinística já existe; framebuffer
-> ainda não.
+> **Status: Fase 4 implementada e validada em VT.** A TUI lê evdev quando há
+> permissão, descobre dispositivos, faz hotplug, oferece fallback degradado,
+> desafios, Alvos e captura PNG. O backend framebuffer foi validado em VT
+> local 1920×1080 32 bpp.
 >
 > Nome e binário: **Mouse Test** (`mouse_test`). Q-001 resolvida em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
@@ -24,7 +24,7 @@ relativo real, códigos de botão, wheel de alta resolução e timestamps do ker
 A TUI pode cair para eventos de mouse do terminal (`crossterm`) quando não há
 permissão de evdev, com limitações explicitamente sinalizadas.
 
-## Estado atual (Fase 3)
+## Estado atual (Fase 4)
 
 Implementado:
 
@@ -35,18 +35,21 @@ Implementado:
 - seletor de dispositivo, desafio de botões e desafio de scroll;
 - modo Alvos com clique, arraste e duplo clique, seed reproduzível e métricas;
 - captura PNG determinística 1344×756 (`--capture-frame`), sem evdev ou TTY;
+- backend framebuffer (`--backend fb`): 32/24/16 bpp, pan/fallback, cursor
+  software, `KD_GRAPHICS`, sinais e restauração do console;
 - snapshots de texto da TUI para alvos, mono e modo degradado;
 - estimador de taxa com histograma, jitter e confiança;
 - diagnóstico textual (`--diagnostics`) e lista de dispositivos;
-- CLI com `--device`, `--grab`, `--grab-force`, `--require-evdev`,
-  `--tui-mouse`, `--mode`, `--lang`, `--color`, `--list-devices`,
-  `--capture-frame`;
+- CLI com `--device`, `--fb-device`, `--grab`, `--grab-force`,
+  `--require-evdev`, `--tui-mouse`, `--mode`, `--lang`, `--color`,
+  `--list-devices`, `--capture-frame`;
 - TUI `ratatui` com banner, log, ajuda e layouts Wide/Normal/Compact/Minimal;
-- 144 testes (132 unitários + 7 de CLI + 5 snapshots).
+- 164 testes (152 unitários + 7 de CLI + 5 snapshots).
 
-Leitura evdev validada com o mouse HID `1bcf:08a0` (fonte `evdev`). O caminho
-degradado foi validado em PTY. Pendentes: exercício de extras/scroll hi-res e
-hotplug em hardware, performance medida e backend framebuffer.
+Leitura evdev validada com o mouse HID `1bcf:08a0` (fonte `evdev`). O usuário
+validou extras, scroll hi-res/horizontal, hotplug e o backend framebuffer em VT
+1920×1080 32 bpp. Pendentes: 24/16 bpp em hardware, sinais/pânico do fb e
+performance medida da TUI.
 
 ## Rodando
 
@@ -57,6 +60,9 @@ cargo run -- --list-devices        # lista pontos de entrada e permissões
 cargo run -- --diagnostics diag.txt
 cargo run -- --capture-frame captura.png --seed 7
 cargo run -- --device /dev/input/event5
+cargo run -- --backend fb          # requer VT local; validado 1920×1080 32 bpp
+./testes_debug.sh                  # relatório único (fb preflight opcional)
+./testes_debug.sh --with-fb        # inclui execução de 5 s no fb
 cargo test                         # testes de domínio, TUI, input e CLI
 ```
 
@@ -86,7 +92,7 @@ cargo test                         # testes de domínio, TUI, input e CLI
 | --- | --- | --- | --- |
 | Terminal com evdev acessível | TUI | evdev | completo |
 | Terminal sem evdev | TUI | `crossterm` (limitado) | degradado |
-| VT de texto com evdev | fbdev | evdev | completo |
+| VT de texto com evdev | fbdev | evdev | completo (validado 1920×1080 32 bpp) |
 | VT de texto sem evdev | fbdev | nenhuma | bloqueado com erro acionável |
 
 `--backend auto` é conservador e escolhe **TUI**. O framebuffer só é usado com
@@ -120,7 +126,7 @@ modos 2 e 3; o modo Alvos (clique, arraste e duplo clique) é o modo 5.
   `input`; alguns sistemas usam `plugdev`). Sem ela, a TUI cai para o mouse do
   terminal; use `--require-evdev` para falhar em vez de degradar.
 - Para framebuffer: `/dev/fb0`, VT de texto ativo (`tty` = `/dev/ttyN`) e
-  permissão (tipicamente grupo `video`).
+  permissão (tipicamente grupo `video`). O fb só é usado com `--backend fb`.
 - Sem rede, sem telemetria, sem fontes online.
 
 ## Instalação planejada
@@ -180,8 +186,10 @@ pode ler teclado).
   do sensor. Isso é backlog.
 - Sem framebuffer em Wayland/X11/SSH; diagnóstico recusa esses ambientes.
 - Touchpad/tablet têm suporte básico apenas quando selecionados explicitamente.
-- A captura PNG usa pintor RGBA e fonte 5×7 embutidos; é uma referência
-  determinística de QA, não o render final do framebuffer.
+- A captura PNG e o framebuffer usam o mesmo pintor RGBA e fonte 5×7 embutidos
+  (D-016); o texto é mais simples que uma fonte vetorial.
+- O fb foi validado em VT 1920×1080 32 bpp; 24/16 bpp têm testes de parse e
+  packing, mas ainda não foram exercitados em hardware.
 - Não altera configurações do mouse (DPI, polling, RGB, macros).
 
 ## Licenças planejadas

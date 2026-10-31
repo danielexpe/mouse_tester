@@ -20,7 +20,7 @@ fn framebuffer_backend_is_reported_as_unavailable() {
     let output = binary().arg("--backend").arg("fb").output().unwrap();
     assert_eq!(output.status.code(), Some(3));
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Phase 4"));
+    assert!(stderr.contains("VT") || stderr.contains("framebuffer"));
 }
 
 #[test]

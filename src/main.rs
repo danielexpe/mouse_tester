@@ -13,6 +13,8 @@ use mouse_test::cli::{BackendArg, Cli, TuiMouseArg};
 use mouse_test::core::device::DeviceInfo;
 use mouse_test::core::geometry::Bounds;
 use mouse_test::input::{discover, InputController, InputError, Selection};
+use mouse_test::platform::fb::{self, FbConsole, FbDevice, FbError};
+use mouse_test::platform::signals;
 use mouse_test::platform::{install_panic_hook, set_mouse_capture, TuiGuard};
 use mouse_test::theme::Theme;
 
@@ -24,6 +26,8 @@ enum RunError {
     Tui(String),
     #[error("input unavailable: {0}")]
     Input(String),
+    #[error("framebuffer permission: {0}")]
+    FbPermission(String),
     #[error("I/O error: {0}")]
     Io(#[from] std::io::Error),
 }
@@ -32,7 +36,7 @@ impl RunError {
     fn exit_code(&self) -> u8 {
         match self {
             Self::Backend(_) | Self::Tui(_) => 3,
-            Self::Input(_) => 4,
+            Self::Input(_) | Self::FbPermission(_) => 4,
             Self::Io(_) => 1,
         }
     }
@@ -66,11 +70,89 @@ fn run(cli: Cli) -> Result<(), RunError> {
     }
 
     match cli.backend {
-        BackendArg::Fb => Err(RunError::Backend(
-            "the framebuffer backend is planned for Phase 4; use --backend tui".to_string(),
-        )),
+        BackendArg::Fb => run_fb(cli),
         BackendArg::Auto | BackendArg::Tui => run_tui(cli),
     }
+}
+
+fn map_fb_error(error: FbError) -> RunError {
+    match &error {
+        FbError::Io(io_error) if io_error.kind() == std::io::ErrorKind::PermissionDenied => {
+            RunError::FbPermission(error.to_string())
+        }
+        _ => RunError::Backend(error.to_string()),
+    }
+}
+
+fn run_fb(cli: Cli) -> Result<(), RunError> {
+    if !fb::is_vt() {
+        return Err(RunError::Backend(
+            "--backend fb requires a local text VT (/dev/ttyN); run it from tty2..tty63"
+                .to_string(),
+        ));
+    }
+
+    let controller = create_evdev_controller(&cli)?;
+    let mut device = FbDevice::open(&cli.fb_device).map_err(map_fb_error)?;
+    fb::install_panic_hook();
+    signals::install()?;
+    signals::clear();
+    let _console = FbConsole::enter().map_err(|error| {
+        if error.kind() == std::io::ErrorKind::PermissionDenied {
+            RunError::FbPermission(format!("/dev/tty: {error}"))
+        } else {
+            RunError::Backend(format!("/dev/tty: {error}"))
+        }
+    })?;
+    device.unblank().map_err(map_fb_error)?;
+
+    let flags = UiFlags {
+        no_animations: cli.no_animations,
+        no_trail: cli.no_trail,
+        raw_log: cli.raw_log,
+    };
+    let mut app = App::new(AppConfig {
+        bounds: Bounds::new(1344, 756),
+        lang: cli.language(),
+        theme: Theme::new(cli.color_tier()),
+        flags,
+        initial_mode: cli.mode.mode(),
+        seed: cli.seed,
+        demo_seed: if cli.demo { Some(cli.seed) } else { None },
+        controller,
+        grab: cli.grab,
+        grab_force: cli.grab_force,
+    });
+
+    let started = Instant::now();
+    loop {
+        if signals::triggered() {
+            break;
+        }
+        let now_us = started.elapsed().as_micros() as u64;
+        app.update(now_us);
+        let frame = mouse_test::render::fb::render(&app, device.xres(), device.yres());
+        device.present(&frame).map_err(map_fb_error)?;
+
+        if app.quit {
+            break;
+        }
+
+        let timeout = if app.demo_active {
+            Duration::from_millis(16)
+        } else {
+            Duration::from_millis(100)
+        };
+        if event::poll(timeout)? {
+            match event::read()? {
+                Event::Key(key) => app.handle_key(key),
+                Event::Resize(_, _) => {}
+                _ => {}
+            }
+        }
+    }
+
+    Ok(())
 }
 
 fn list_devices(all_devices: bool) -> Result<(), RunError> {
@@ -101,6 +183,8 @@ fn list_devices(all_devices: bool) -> Result<(), RunError> {
 fn run_tui(cli: Cli) -> Result<(), RunError> {
     let controller = create_controller(&cli)?;
     install_panic_hook();
+    signals::install()?;
+    signals::clear();
     let _guard = TuiGuard::enter().map_err(|error| RunError::Tui(error.to_string()))?;
 
     let backend = CrosstermBackend::new(stdout());
@@ -127,6 +211,9 @@ fn run_tui(cli: Cli) -> Result<(), RunError> {
     let started = Instant::now();
     let mut mouse_capture = false;
     loop {
+        if signals::triggered() {
+            break;
+        }
         let now_us = started.elapsed().as_micros() as u64;
         app.update(now_us);
 
@@ -212,6 +299,21 @@ fn create_controller(cli: &Cli) -> Result<Option<InputController>, RunError> {
                 Err(RunError::Input(error.to_string()))
             }
         }
+    }
+}
+
+fn create_evdev_controller(cli: &Cli) -> Result<Option<InputController>, RunError> {
+    if cli.demo {
+        return Ok(None);
+    }
+    let discovery = discover();
+    let selection = selection_from_cli(cli, &discovery.devices)?;
+    match InputController::start(selection, cli.grab, cli.grab_force) {
+        Ok(controller) if controller.status().primary.is_some() => Ok(Some(controller)),
+        Ok(_) => Err(RunError::Input(
+            "no readable mouse found for the framebuffer backend".to_string(),
+        )),
+        Err(error) => Err(RunError::Input(error.to_string())),
     }
 }
 

@@ -66,8 +66,8 @@ Regras de dependência:
 - `state/` depende de `core/`; modela sessão, modo atual, seleção e flags.
 - `app/` é o único que orquestra backends, canais, relógio e teclado.
 - `render/scene.rs` é independente de backend; descreve primitivas lógicas.
-- `render/tui.rs` depende de `ratatui`; `render/fb.rs` de `tiny-skia` e
-  `fontdue`.
+- `render/tui.rs` depende de `ratatui`; `render/fb.rs` usa o rasterizador
+  interno e a fonte 5×7 (D-016).
 - `platform/` contém todo `unsafe` de sistema (`ioctl`, `poll`, `read`, `mmap`,
   `sigaction`), sempre com `// SAFETY:`.
 - `input/evdev.rs` é seguro; usa a API de `platform/evdev.rs`.
@@ -109,7 +109,7 @@ src/
     mod.rs
     scene.rs           # primitivas compartilhadas
     layout.rs          # breakpoints e geometria
-    text.rs            # layout no fb (fontdue::layout)
+    raster.rs          # pintor RGBA, fonte 5×7 e PNG
     tui.rs             # desenho ratatui + Canvas Braille
     fb.rs              # canvas, escala, blend, cursor
     png.rs             # captura determinística
@@ -297,7 +297,8 @@ Segue o framework, com adaptações:
   primeiro frame imediatamente.
 - Pan com fallback; falha de `FBIOPAN_DISPLAY` desabilita pan, não é fatal.
 - Cursor desenhado por software, última camada.
-- Canvas lógico 1344×756 escalado a 70% do menor eixo e centralizado.
+- Canvas lógico 1344×756 escalado ao espaço disponível, preservando a proporção
+  e centralizado.
 - Teclado via `crossterm` em `/dev/tty`.
 - Sem evdev acessível: erro 4 antes de entrar em `KD_GRAPHICS`; sem dispositivo:
   tela de espera com hotplug.
@@ -309,7 +310,7 @@ Segue o framework, com adaptações:
   polilinha, círculo, anel, grade, texto e camadas com alpha.
 - A cena é calculada uma vez a partir de `&App`; cada backend traduz.
 - TUI: primitivas livres no `Canvas` Braille; painéis e texto com widgets.
-- fb: `tiny-skia` com RGBA pré-multiplicado; texto com `fontdue`.
+- fb: rasterizador interno com RGBA e fonte 5×7 (D-016); sem `tiny-skia` na v1.
 - Cores por tokens semânticos com variantes truecolor/256/16/mono.
 - Sem imagens raster; efeitos e cursor são procedurais.
 - Caches: fonte decodificada uma vez; glifos rasterizados em cache LRU; fundo
@@ -386,8 +387,8 @@ segurança quando aplicável.
 | CLI | `clap` (derive) | parsing e help |
 | TUI | `ratatui` | widgets, Canvas Braille |
 | Terminal | `crossterm` | raw mode, teclado, fallback mouse |
-| Raster | `tiny-skia` | fb, composição, PNG (feature `png-format`) |
-| Texto fb | `fontdue` | rasterização e layout |
+| Raster | interno | fb, composição, PNG determinístico |
+| Texto fb | fonte 5×7 interna | rasterização e layout simples |
 | Sistema | `libc` | ioctls, poll, read, sinais |
 | Erros | `thiserror` | erros de domínio/backend |
 | Build | `xtask` (workspace) | verificação de assets |

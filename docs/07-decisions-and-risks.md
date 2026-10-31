@@ -95,7 +95,7 @@
 
 ### D-009 — Sem `ratatui-image`
 
-- **Status:** aceita.
+- **Status:** aceita; a parte de renderização do fb foi substituída por D-016.
 - **Contexto:** não há arte bitmap; efeitos são procedurais. Protocolos de imagem
   no terminal adicionam complexidade e variação por terminal.
 - **Decisão:** TUI usa `ratatui` Canvas com Braille; fb usa `tiny-skia`.
@@ -160,6 +160,21 @@
   hardware, registrar pendência formal em vez de declarar validação.
 - **Consequências:** release pode sair com fb “pendente de validação”; o backend
   ainda deve compilar e passar testes sem hardware.
+
+### D-016 — Rasterizador interno no framebuffer
+
+- **Status:** aceita; substitui a parte de `tiny-skia`/`fontdue` da D-009.
+- **Contexto:** a captura determinística já usa um pintor RGBA e fonte 5×7
+  embutidos, sem dependências. Adicionar `tiny-skia`/`fontdue` exigiria novas
+  dependências e um asset de fonte para um backend que ainda precisa de
+  validação em VT. O alvo são distros base Ubuntu, com fonte e visual próprios
+  do app.
+- **Decisão:** o fb usa o mesmo rasterizador interno da captura, com blend RGBA,
+  escala do canvas lógico, cursor software e fonte 5×7. `tiny-skia`/`fontdue`
+  ficam no backlog caso a qualidade tipográfica exija.
+- **Consequências:** binário sem dependências novas, comportamento determinístico
+  e testável sem hardware; texto do fb é mais simples que uma fonte vetorial e
+  deve ser revisado na validação visual.
 
 ## 3. Opções de arquitetura (resumo)
 
