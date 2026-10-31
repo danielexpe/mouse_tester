@@ -80,6 +80,19 @@ impl Metrics {
         self.intervals.len()
     }
 
+    pub fn histogram(&self, bins: usize, max_us: u32) -> Vec<u32> {
+        if bins == 0 {
+            return Vec::new();
+        }
+        let width = max_us.max(1).div_ceil(bins as u32).max(1);
+        let mut histogram = vec![0u32; bins];
+        for interval in &self.intervals {
+            let index = (*interval / width).min(bins as u32 - 1) as usize;
+            histogram[index] = histogram[index].saturating_add(1);
+        }
+        histogram
+    }
+
     pub fn events(&self) -> u64 {
         self.events
     }
@@ -168,6 +181,15 @@ mod tests {
         assert_eq!(metrics.confidence(), Confidence::Medium);
         feed(&mut metrics, 1_000, 100);
         assert_eq!(metrics.confidence(), Confidence::High);
+    }
+
+    #[test]
+    fn builds_histogram() {
+        let mut metrics = Metrics::default();
+        feed(&mut metrics, 1_000, 300);
+        let histogram = metrics.histogram(12, 24_000);
+        assert_eq!(histogram.iter().sum::<u32>(), metrics.sample_count() as u32);
+        assert!(histogram[0] > 0);
     }
 
     #[test]

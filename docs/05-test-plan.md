@@ -304,12 +304,21 @@ Adicionar verificação de MSRV quando o CI existir.
 - [ ] `testes_debug.sh` testado em VT.
 - [ ] Nenhum terminal/console corrompido.
 
-## 13. Estado da Fase 1
+## 13. Estado da Fase 2
 
-- [x] 74 testes unitários de domínio, parser mock, TUI (TestBackend) e CLI.
-- [x] 4 testes de integração de CLI (`--list-devices`, `--backend fb`,
-      TUI sem TTY, `--version`).
+- [x] 115 testes unitários: domínio, parser evdev, descoberta por
+      `/proc/bus/input/devices`, classificação, desafios, mapeamento do mouse do
+      terminal, TUI (TestBackend) e diagnóstico.
+- [x] 5 testes de integração de CLI (`--list-devices`, `--all-devices`,
+      `--backend fb`, TUI sem TTY, `--version`).
 - [x] `cargo fmt --check`, `clippy` (com e sem default features), `test` e
       `test --release` verdes.
-- [x] Smoke manual em PTY 120×36: TUI desenha, processa `q` e restaura.
-- [ ] evdev real, hotplug, permissões e fbdev: pendentes (Fases 2 e 4).
+- [x] Smoke manual em PTY: TUI degradada, banner de permissão, seletor de
+      dispositivo, saída por `q` em 120×36 e 80×24 e clique esquerdo via
+      protocolo SGR do mouse do terminal.
+- [x] Descoberta real no ambiente: `/dev/input/event3` listado como mouse
+      `denied`; modo degradado ativado.
+- [x] `--require-evdev` retorna 4; `--diagnostics` gera relatório.
+- [ ] Leitura real de eventos, botões extras, scroll hi-res e hotplug:
+      pendentes de sessão com permissão em `/dev/input`.
+- [ ] fbdev: pendente (Fase 4).

@@ -16,15 +16,17 @@ Data de referência: **2026-10-31**.
 | --- | --- | --- |
 | 0 — Descoberta e especificação | concluída | escopo aprovado pelo usuário em 2026-10-31 |
 | 1 — Fundação | concluída | crate, domínio puro, CLI, mock, TUI placeholder; 78 testes |
-| 2 — TUI funcional | próxima | evdev real, dashboard, modos, snapshots |
+| 2 — TUI funcional | implementada; validação real pendente | evdev, descoberta, hotplug, fallback, desafios, diagnóstico |
 | 3 — Modos ricos | pendente | alvos/arraste/clique duplo, polimento |
 | 4 — Framebuffer | pendente | fbdev, cursor, sinais, validação em VT |
 | 5 — Release | pendente | pacote, instalador, diagnóstico, matriz manual |
 | 6 — Backlog | pendente | DRM/KMS, hidraw, exportação, touchpad |
 
-A Fase 1 foi implementada. A TUI abre e fecha via PTY, mas usa apenas entrada
-mock (`--demo`); evdev, fbdev, modos guiados e captura ainda não existem.
-Nenhuma validação de hardware foi executada.
+As Fases 1 e 2 foram implementadas. A TUI abre e fecha via PTY; a entrada evdev
+foi implementada com descoberta, classificação, thread de leitura, hotplug e
+fallback `crossterm`. O ambiente atual não tem permissão em `/dev/input`, então
+a leitura real de eventos ficou **pendente de validação**; o modo degradado foi
+validado em PTY. framebuffer e captura ainda não existem.
 
 ## 3. Resumo do produto
 
@@ -34,8 +36,9 @@ taxa de relatório com efeitos em uma TUI (`ratatui`) ou no framebuffer
 (`/dev/fb0`). O mouse é o objeto do teste; a UI é navegada apenas por teclado.
 A TUI é o backend padrão; o framebuffer é explícito.
 
-Estado atual: Fase 1 concluída com domínio puro, CLI, entrada mock e TUI
-placeholder. `--demo` alimenta eventos sintéticos para inspeção visual.
+Estado atual: Fase 2 implementada com domínio puro, CLI, evdev, fallback,
+desafios, seletor de dispositivo e diagnóstico textual. `--demo` continua
+disponível para inspeção sem hardware.
 
 ## 4. Decisões congeladas
 
@@ -137,6 +140,7 @@ declarar validação manual sem execução registrada.
 | --- | --- | --- |
 | 2026-10-31 | Leitura do framework e criação das especificações iniciais (Fase 0). Nenhum código. | `README.md`, `AGENTS.md`, `docs/01`..`docs/10` |
 | 2026-10-31 | Fase 1 implementada: crate, domínio puro, input mock, CLI, TUI placeholder e guardas. 78 testes; TUI validada em PTY com `q`. Sem evdev/fb. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/cli.rs`, `README.md`, `AGENTS.md`, `docs/06-roadmap.md` |
+| 2026-10-31 | Fase 2 implementada: evdev (descoberta, classificação, thread, hotplug), fallback TUI, seletor, desafios, diagnóstico. 120 testes; modo degradado e clique SGR validados em PTY. Leitura real pendente por falta de permissão em `/dev/input`. | `src/input/`, `src/platform/evdev.rs`, `src/core/modes/`, `src/diagnostics.rs`, `src/app.rs`, `src/render/tui.rs`, docs |
 
 ## 11. Fases
 
@@ -152,10 +156,12 @@ declarar validação manual sem execução registrada.
 
 ## 12. Notas para a próxima sessão
 
-- Escopo da Fase 0 aprovado; seguir para a Fase 2.
+- Fase 2 implementada; falta validar leitura evdev com permissão real.
+- No ambiente atual o usuário não está no grupo `input`; `/dev/input/event3`
+  está `root:input 660` e o app caiu para o modo degradado.
+- Próximo passo: validar evdev real em uma sessão com `newgrp input`/novo login
+  (ou grupo dono equivalente), registrar modelo/taxa/botões e então iniciar a
+  Fase 3 (alvos/arraste/duplo clique e captura).
 - Q-001..Q-008 continuam em aberto; os defaults estão em uso.
-- Fase 2: criar `platform/evdev.rs` e `input/evdev.rs`, descoberta/classificação,
-  thread de leitura, hotplug, fallback `crossterm`, seletor de dispositivo e
-  mensagens de permissão. Não iniciar fbdev antes da TUI funcional.
 - Definir hardware/distro de validação (Q-004) antes da Fase 4.
-- Rodar `cargo test` e o smoke em PTY após cada etapa.
+- Não iniciar fbdev antes da validação básica da TUI com evdev real.

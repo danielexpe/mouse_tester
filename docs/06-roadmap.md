@@ -75,7 +75,7 @@ Evidência: `cargo test` = 74 unitários + 4 integração; smoke em `script` PTY
 
 ## 5. Fase 2 — TUI funcional com evdev
 
-**Status:** próxima.
+**Status:** implementada; validação em hardware pendente por permissão.
 
 Objetivo: o produto principal funcionando no terminal.
 
@@ -101,16 +101,24 @@ Entregáveis:
 
 Critérios de saída:
 
-- [ ] Fluxo completo com mouse real na TUI.
-- [ ] Botões advertising e extras.
-- [ ] Scroll vertical/horizontal e hi-res sem dupla contagem.
-- [ ] Hotplug ≤ 2 s.
-- [ ] Degradado sem evdev, sem travar.
-- [ ] Snapshots de todas as telas/idiomas/layouts.
-- [ ] Restauração em saída normal, `Ctrl+C` e SIGTERM.
-- [ ] Testes automatizados verdes com e sem features.
+- [ ] Fluxo completo com mouse real na TUI (bloqueado: usuário fora de `input`).
+- [ ] Botões advertising e extras (pendente de hardware).
+- [ ] Scroll vertical/horizontal e hi-res sem dupla contagem (parser testado; hardware pendente).
+- [ ] Hotplug ≤ 2 s (implementado; hardware pendente).
+- [x] Degradado sem evdev, sem travar (validado em PTY).
+- [ ] Snapshots de todas as telas/idiomas/layouts (há testes de render, sem suíte de snapshots completa).
+- [ ] Restauração em saída normal, `Ctrl+C` e SIGTERM (normal e `Ctrl+C` cobertos; SIGTERM pendente).
+- [x] Testes automatizados verdes com e sem features.
+
+Evidência: 115 unitários + 5 de integração; descoberta real lista
+`/dev/input/event3` como mouse `denied`; TUI degradada validada em PTY 120×36 e
+80×24, inclusive clique L via protocolo SGR; `--diagnostics` gerado;
+`--require-evdev` retorna 4. A leitura real de eventos evdev não foi exercitada
+porque o usuário não está no grupo `input`.
 
 ## 6. Fase 3 — Modos ricos, acessibilidade e captura
+
+**Status:** próxima, após validar evdev real.
 
 Objetivo: completar a experiência e o QA visual.
 

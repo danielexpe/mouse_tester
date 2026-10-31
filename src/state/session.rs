@@ -1,10 +1,11 @@
 use std::collections::VecDeque;
 
 use crate::core::buttons::ButtonState;
-use crate::core::device::{DeviceClass, DeviceId, DeviceInfo};
+use crate::core::device::{Capabilities, DeviceClass, DeviceId, DeviceInfo};
 use crate::core::effects::{Edge, Effects};
 use crate::core::geometry::Bounds;
 use crate::core::metrics::Metrics;
+use crate::core::modes::{ButtonsChallenge, ScrollChallenge};
 use crate::core::pointer::PointerState;
 use crate::core::scroll::{ScrollState, WheelFrame};
 use crate::input::{InputEvent, InputKind, InputSource};
@@ -58,6 +59,8 @@ pub struct Session {
     pub scroll: ScrollState,
     pub effects: Effects,
     pub metrics: Metrics,
+    pub buttons_challenge: ButtonsChallenge,
+    pub scroll_challenge: ScrollChallenge,
     pub devices: Vec<DeviceInfo>,
     pub primary: Option<DeviceId>,
     pub log: VecDeque<LogEntry>,
@@ -76,6 +79,8 @@ impl Session {
             scroll: ScrollState::default(),
             effects: Effects::default(),
             metrics: Metrics::default(),
+            buttons_challenge: ButtonsChallenge::new(&Capabilities::default()),
+            scroll_challenge: ScrollChallenge::from_capabilities(None),
             devices: Vec::new(),
             primary: None,
             log: VecDeque::with_capacity(LOG_CAPACITY),
@@ -93,6 +98,17 @@ impl Session {
         self.devices.push(info);
         if self.primary.is_none() && candidate {
             self.primary = Some(id);
+            self.refresh_challenges();
+        }
+    }
+
+    pub fn sync_devices(&mut self, devices: Vec<DeviceInfo>, primary: Option<DeviceId>) {
+        let old_primary = self.primary;
+        self.devices = devices;
+        self.primary = primary.filter(|id| self.devices.iter().any(|device| device.id == *id));
+        if self.primary != old_primary {
+            self.pointer.recenter();
+            self.refresh_challenges();
         }
     }
 
@@ -100,6 +116,7 @@ impl Session {
         if self.devices.iter().any(|device| device.id == id) {
             self.primary = Some(id);
             self.pointer.recenter();
+            self.refresh_challenges();
         }
     }
 
@@ -118,6 +135,7 @@ impl Session {
                 .or_else(|| self.devices.first())
                 .map(|device| device.id);
             self.pointer.recenter();
+            self.refresh_challenges();
         }
     }
 
@@ -147,6 +165,9 @@ impl Session {
                     .buttons
                     .apply(*code, *pressed, event.time_us, self.pointer.pos());
                 if update.pressed {
+                    if self.mode == Mode::Buttons {
+                        self.buttons_challenge.observe(*code);
+                    }
                     self.effects.push(Effects::button(
                         *code,
                         self.pointer.pos(),
@@ -228,6 +249,7 @@ impl Session {
         self.log.clear();
         self.overflow_events = 0;
         self.last_event_us = 0;
+        self.refresh_challenges();
     }
 
     fn push_log(&mut self, event: &InputEvent, kind: LogKind) {
@@ -239,6 +261,15 @@ impl Session {
             device: event.device,
             kind,
         });
+    }
+
+    fn refresh_challenges(&mut self) {
+        let capabilities = self
+            .primary_device()
+            .map(|device| device.capabilities.clone())
+            .unwrap_or_default();
+        self.buttons_challenge = ButtonsChallenge::new(&capabilities);
+        self.scroll_challenge = ScrollChallenge::from_capabilities(Some(&capabilities));
     }
 
     fn edge_for_cursor(&self) -> Edge {

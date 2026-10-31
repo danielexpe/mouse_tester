@@ -1,5 +1,20 @@
 # 09 — Especificação de entrada (evdev e fallback)
 
+## 0. Status de implementação (Fase 2)
+
+Implementado: parser de `/proc/bus/input/devices`, descoberta por sysfs,
+classificação por capacidades, ioctls de nome/IDs/capacidades/abs/estado de
+teclas, leitura com `poll`, thread, canal limitado, hotplug de 1 s, normalização
+de movimento/botões/wheel hi-res, absolutos básicos, fallback `crossterm` e
+recusa de grab em combo.
+
+Pendente de validação real: leitura de eventos no hardware. O ambiente de
+desenvolvimento atual lista `/dev/input/event3` como mouse, mas o usuário não
+está no grupo `input` e a abertura retorna `EACCES`; o app exercita o caminho
+degradado. Não declarar leitura evdev validada até executar em sessão com
+permissão. O fallback foi validado em PTY para clique esquerdo; wheel/scroll do
+terminal tem teste unitário de mapeamento, mas não foi validado ponta a ponta.
+
 ## 1. Objetivos
 
 1. Ler movimento relativo, botões, scroll e timestamps diretamente do kernel.

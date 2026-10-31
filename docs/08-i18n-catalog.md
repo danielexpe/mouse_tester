@@ -165,11 +165,9 @@ Rótulos curtos no canvas: `[L]`, `[R]`, `[M]`, `[S1]`, `[S2]`, `[F]`, `[B]`,
 | `mode.buttons.prompt` | Pressione: {button} | Press: {button} |
 | `mode.buttons.progress` | {done}/{total} | {done}/{total} |
 | `mode.buttons.missing` | Faltam: {list} | Missing: {list} |
-| `mode.buttons.done` | Todos os botões vistos | All buttons seen |
 | `mode.buttons.skip` | Pular | Skip |
 | `mode.scroll.prompt` | Role para {direction} | Scroll {direction} |
 | `mode.scroll.progress` | {done}/{total} | {done}/{total} |
-| `mode.scroll.done` | Scroll concluído | Scroll complete |
 | `mode.targets.prompt` | Clique no alvo | Click the target |
 | `mode.targets.hits` | Acertos | Hits |
 | `mode.targets.misses` | Erros | Misses |
@@ -219,7 +217,7 @@ Rótulos curtos no canvas: `[L]`, `[R]`, `[M]`, `[S1]`, `[S2]`, `[F]`, `[B]`,
 | `banner.hotplug.removed` | Mouse removido: {name} | Mouse removed: {name} |
 | `banner.hotplug.switched` | Alternado para {name} | Switched to {name} |
 | `banner.degraded` | Modo degradado: mouse do terminal | Degraded mode: terminal mouse |
-| `banner.permission` | Veja a ajuda para permissões | See help for permissions |
+| `banner.permission` | Permissão negada em /dev/input; veja a ajuda ou use o mouse do terminal | Permission denied on /dev/input; see help or use the terminal mouse |
 | `banner.overflow` | {count} eventos descartados | {count} events dropped |
 | `banner.no_device` | Conecte um mouse para começar | Connect a mouse to start |
 
@@ -284,3 +282,17 @@ Rótulos curtos no canvas: `[L]`, `[R]`, `[M]`, `[S1]`, `[S2]`, `[F]`, `[B]`,
 - [ ] Textos longos não estouram.
 - [ ] `F2` funciona em todas as telas.
 - [ ] Nomes de dispositivo não são traduzidos.
+
+## 17. Chaves adicionadas na Fase 2
+
+| Chave | pt-BR | en |
+| --- | --- | --- |
+| `help.device_picker` | T fecha, setas escolhem, Enter aplica | T closes, arrows select, Enter applies |
+| `device.ok` | ok | ok |
+| `device.denied` | sem permissão | denied |
+| `device.primary` | primário | primary |
+| `banner.waiting` | Aguardando um mouse legível | Waiting for a readable mouse |
+| `polling.histogram` | Histograma | Histogram |
+
+As chaves acima são expostas na implementação como variantes de `i18n::Key`;
+os nomes semânticos deste documento continuam sendo a referência de tradução.

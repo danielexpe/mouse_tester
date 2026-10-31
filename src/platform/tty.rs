@@ -3,6 +3,7 @@ use std::panic;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use crossterm::cursor::{Hide, Show};
+use crossterm::event::{DisableMouseCapture, EnableMouseCapture};
 use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -51,5 +52,13 @@ pub fn restore_terminal() {
         return;
     }
     let _ = disable_raw_mode();
-    let _ = execute!(stdout(), Show, LeaveAlternateScreen);
+    let _ = execute!(stdout(), DisableMouseCapture, Show, LeaveAlternateScreen);
+}
+
+pub fn set_mouse_capture(enabled: bool) {
+    if enabled {
+        let _ = execute!(stdout(), EnableMouseCapture);
+    } else {
+        let _ = execute!(stdout(), DisableMouseCapture);
+    }
 }

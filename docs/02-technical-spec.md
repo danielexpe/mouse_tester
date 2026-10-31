@@ -80,8 +80,10 @@ src/
   lib.rs               # reexporta módulos para testes
   cli.rs               # flags, enums, validação
   app.rs               # App, roteamento de ações, loop TUI/fb
+  diagnostics.rs       # relatório textual de ambiente/entrada/fb
   input/
-    mod.rs             # InputEvent, InputHub, InputStatus
+    mod.rs             # InputEvent, InputSource
+    controller.rs      # evdev ou fallback degradado
     evdev.rs           # descoberta, thread de leitura, normalização
     capabilities.rs    # bits EVIOCGBIT -> capacidades
     classify.rs        # mouse/touchpad/tablet/teclado/joystick/combo

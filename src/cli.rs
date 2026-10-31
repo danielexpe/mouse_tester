@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{Parser, ValueEnum};
 
 use crate::i18n::Lang;
@@ -50,6 +52,13 @@ impl LangArg {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum TuiMouseArg {
+    Auto,
+    On,
+    Off,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum ModeArg {
     Dashboard,
     Buttons,
@@ -88,6 +97,24 @@ pub struct Cli {
 
     #[arg(long)]
     pub all_devices: bool,
+
+    #[arg(long)]
+    pub diagnostics: Option<PathBuf>,
+
+    #[arg(long)]
+    pub device: Option<String>,
+
+    #[arg(long)]
+    pub grab: bool,
+
+    #[arg(long)]
+    pub grab_force: bool,
+
+    #[arg(long)]
+    pub require_evdev: bool,
+
+    #[arg(long, value_enum, default_value_t = TuiMouseArg::Auto)]
+    pub tui_mouse: TuiMouseArg,
 
     #[arg(long, value_enum)]
     pub lang: Option<LangArg>,

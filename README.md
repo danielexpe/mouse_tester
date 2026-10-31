@@ -1,8 +1,8 @@
 # MouseScope
 
-> **Status: Fase 1 concluída.** O crate, o domínio puro, o CLI e uma TUI
-> placeholder com entrada mock já existem. evdev, framebuffer, desafios guiados e
-> captura ainda não foram implementados.
+> **Status: Fase 2 implementada; validação evdev real pendente.** A TUI já lê
+> evdev quando há permissão, descobre dispositivos, faz hotplug, oferece
+> fallback degradado e desafios. framebuffer e captura ainda não existem.
 >
 > Nome provisório: **MouseScope** (`mousescope`). Veja a questão aberta Q-001 em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
@@ -23,28 +23,36 @@ relativo real, códigos de botão, wheel de alta resolução e timestamps do ker
 A TUI pode cair para eventos de mouse do terminal (`crossterm`) quando não há
 permissão de evdev, com limitações explicitamente sinalizadas.
 
-## Estado atual (Fase 1)
+## Estado atual (Fase 2)
 
 Implementado:
 
-- domínio puro de ponteiro, botões, scroll, efeitos e métricas;
-- estimador de taxa com fixtures de 125 Hz e 1000 Hz;
-- entrada mock e demo sintética (`--demo`);
-- CLI com `--backend`, `--mode`, `--lang`, `--color`, `--list-devices`,
-  `--no-animations`, `--no-trail`, `--raw-log`, `--seed` e `--demo`;
-- TUI `ratatui` responsiva com dashboard placeholder, painéis, log e ajuda;
-- guarda RAII do terminal e panic hook;
-- 78 testes (74 unitários + 4 de integração de CLI).
+- descoberta de dispositivos via `/proc/bus/input/devices` e classificação;
+- leitura evdev em thread, com hotplug por varredura de 1 s;
+- normalização de movimento, botões, scroll normal/hi-res e absolutos básicos;
+- fallback degradado com mouse do terminal quando evdev é negado;
+- seletor de dispositivo, desafio de botões e desafio de scroll;
+- estimador de taxa com histograma, jitter e confiança;
+- diagnóstico textual (`--diagnostics`) e lista de dispositivos;
+- CLI com `--device`, `--grab`, `--grab-force`, `--require-evdev`,
+  `--tui-mouse`, `--mode`, `--lang`, `--color`, `--list-devices`;
+- TUI `ratatui` com banner, log, ajuda e layouts Wide/Normal/Compact/Minimal;
+- 120 testes (115 unitários + 5 de integração de CLI).
 
-Ainda não implementado: evdev, seleção real de dispositivo, hotplug, desafios
-guiados, alvos, framebuffer, captura PNG e diagnóstico textual.
+Pendente de validação real: leitura de eventos evdev no hardware (o ambiente de
+desenvolvimento atual não tem o usuário no grupo `input`). O caminho degradado
+foi validado em PTY. Ainda não implementado: alvos/arraste/duplo clique,
+framebuffer e captura PNG.
 
-## Rodando a Fase 1
+## Rodando
 
 ```bash
-cargo run -- --demo          # TUI com eventos sintéticos
-cargo run -- --list-devices  # lista o dispositivo mock
-cargo test                   # testes de domínio, TUI e CLI
+cargo run                          # TUI, evdev ou fallback
+cargo run -- --demo                # TUI com eventos sintéticos
+cargo run -- --list-devices        # lista pontos de entrada e permissões
+cargo run -- --diagnostics diag.txt
+cargo run -- --device /dev/input/event5
+cargo test                         # testes de domínio, TUI, input e CLI
 ```
 
 ## O que o app mostra
@@ -87,22 +95,22 @@ nunca um controle da UI, para evitar que um clique de teste altere o aplicativo.
 | `1`..`5` | Dashboard, Botões, Scroll, Taxa, Alvos |
 | `Tab` / `Shift+Tab` | Próximo/anterior modo |
 | `T` | Seletor de dispositivo |
+| `↑` / `↓` / `Enter` | Navegar e aplicar no seletor |
 | `L` | Alternar log bruto |
 | `R` | Reiniciar modo/contadores |
 | `F2` | Alternar idioma (pt-BR/en) |
 | `F1` ou `?` | Ajuda |
 | `Q`, `Esc` ou `Ctrl+C` | Sair |
-| Setas / `Enter` | Navegar em seletores e ajuda (Fase 2) |
-
-`T` (seletor de dispositivo) e os desafios guiados pertencem à Fase 2; na Fase 1
-o dashboard usa o dispositivo mock.
+`T` abre o seletor de dispositivo. Os desafios de botões e scroll estão nos
+modos 2 e 3. Alvos/arraste/duplo clique ficam para a Fase 3.
 
 ## Requisitos
 
 - Linux x86_64, Rust stable (MSRV 1.88, edição 2021).
 - Terminal local com TTY para a TUI; SSH funciona de forma degradada.
 - Para evdev: permissão de leitura em `/dev/input/event*` (tipicamente grupo
-  `input`; alguns sistemas usam `plugdev`).
+  `input`; alguns sistemas usam `plugdev`). Sem ela, a TUI cai para o mouse do
+  terminal; use `--require-evdev` para falhar em vez de degradar.
 - Para framebuffer: `/dev/fb0`, VT de texto ativo (`tty` = `/dev/ttyN`) e
   permissão (tipicamente grupo `video`).
 - Sem rede, sem telemetria, sem fontes online.
@@ -110,10 +118,10 @@ o dashboard usa o dispositivo mock.
 ## Instalação planejada
 
 ```text
-mousescope                 # TUI, detecção automática de dispositivo
-mousescope --backend fb    # console, exige VT e permissões
-mousescope --list-devices
-mousescope --diagnostics mousescope-debug.txt
+mousescope                          # TUI, evdev ou fallback
+mousescope --backend fb             # console, exige VT e permissões
+mousescope --list-devices           # lista pontos de entrada
+mousescope --diagnostics diag.txt   # ambiente, permissões e capacidades
 ```
 
 O pacote futuro incluirá binário, `README`, licenças, `install.sh` e
@@ -152,7 +160,10 @@ pode ler teclado).
 - A TUI não consegue esconder o ponteiro do sistema operacional; no fbdev o
   cursor desenhado é o único.
 - O fallback `crossterm` não fornece movimento relativo bruto nem taxa de
-  relatório; não há hover em muitos terminais.
+  relatório; não há hover em muitos terminais. Ele é ativado apenas quando evdev
+  não está disponível (ou com `--tui-mouse on`).
+- A leitura evdev real ainda não foi validada neste ambiente por falta de
+  permissão em `/dev/input`; o parser e o caminho degradado foram testados.
 - A taxa de relatório é uma **estimativa** medida, não a configuração nominal do
   mouse; coalescência do kernel/driver pode reduzi-la.
 - Não mede DPI, latência de clique ponta a ponta, latência wireless ou qualidade

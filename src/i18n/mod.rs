@@ -78,6 +78,23 @@ pub enum Key {
     HelpTitle,
     HelpBody,
     TooSmall,
+    Devices,
+    DevicePickerHint,
+    DeviceOk,
+    DeviceDenied,
+    DevicePrimary,
+    PressButton,
+    AllButtonsSeen,
+    ScrollStepUp,
+    ScrollStepDown,
+    ScrollStepLeft,
+    ScrollStepRight,
+    ScrollPrompt,
+    ScrollDone,
+    BannerDegraded,
+    BannerPermission,
+    BannerWaiting,
+    Histogram,
 }
 
 pub fn tr(lang: Lang, key: Key) -> &'static str {
@@ -86,8 +103,8 @@ pub fn tr(lang: Lang, key: Key) -> &'static str {
         (Lang::En, Key::AppTitle) => "MouseScope",
         (Lang::PtBr, Key::Subtitle) => "Laboratório visual de mouse",
         (Lang::En, Key::Subtitle) => "Visual mouse lab",
-        (Lang::PtBr, Key::Phase) => "Fase 1",
-        (Lang::En, Key::Phase) => "Phase 1",
+        (Lang::PtBr, Key::Phase) => "Fase 2",
+        (Lang::En, Key::Phase) => "Phase 2",
         (Lang::PtBr, Key::Backend) => "Backend",
         (Lang::En, Key::Backend) => "Backend",
         (Lang::PtBr, Key::Source) => "Fonte",
@@ -172,16 +189,54 @@ pub fn tr(lang: Lang, key: Key) -> &'static str {
             "A navegação é só por teclado; o mouse é a entrada sob teste.\n\
              1-5 escolhe o modo, TAB alterna, R reinicia, L abre o log.\n\
              F2 alterna pt-BR/en, F1 fecha esta ajuda, Q sai.\n\
-             Fase 1 usa entrada mock; evdev e framebuffer vêm depois."
+             A Fase 2 usa evdev; sem permissão, o mouse do terminal cobre o básico."
         }
         (Lang::En, Key::HelpBody) => {
             "Navigation is keyboard-only; the mouse is the input under test.\n\
              1-5 selects a mode, TAB cycles, R resets, L opens the log.\n\
              F2 toggles pt-BR/en, F1 closes this help, Q quits.\n\
-             Phase 1 uses mock input; evdev and framebuffer come later."
+             Phase 2 uses evdev; without permission, the terminal mouse covers the basics."
         }
         (Lang::PtBr, Key::TooSmall) => "Terminal pequeno: redimensione para pelo menos 60x20.",
         (Lang::En, Key::TooSmall) => "Terminal too small: resize to at least 60x20.",
+        (Lang::PtBr, Key::Devices) => "Dispositivos",
+        (Lang::En, Key::Devices) => "Devices",
+        (Lang::PtBr, Key::DevicePickerHint) => "T fecha  setas escolhem  Enter aplica",
+        (Lang::En, Key::DevicePickerHint) => "T closes  arrows select  Enter applies",
+        (Lang::PtBr, Key::DeviceOk) => "ok",
+        (Lang::En, Key::DeviceOk) => "ok",
+        (Lang::PtBr, Key::DeviceDenied) => "sem permissão",
+        (Lang::En, Key::DeviceDenied) => "denied",
+        (Lang::PtBr, Key::DevicePrimary) => "primário",
+        (Lang::En, Key::DevicePrimary) => "primary",
+        (Lang::PtBr, Key::PressButton) => "Pressione: {button}",
+        (Lang::En, Key::PressButton) => "Press: {button}",
+        (Lang::PtBr, Key::AllButtonsSeen) => "Todos os botões vistos",
+        (Lang::En, Key::AllButtonsSeen) => "All buttons seen",
+        (Lang::PtBr, Key::ScrollStepUp) => "cima",
+        (Lang::En, Key::ScrollStepUp) => "up",
+        (Lang::PtBr, Key::ScrollStepDown) => "baixo",
+        (Lang::En, Key::ScrollStepDown) => "down",
+        (Lang::PtBr, Key::ScrollStepLeft) => "esquerda",
+        (Lang::En, Key::ScrollStepLeft) => "left",
+        (Lang::PtBr, Key::ScrollStepRight) => "direita",
+        (Lang::En, Key::ScrollStepRight) => "right",
+        (Lang::PtBr, Key::ScrollPrompt) => "Role para {direction}",
+        (Lang::En, Key::ScrollPrompt) => "Scroll {direction}",
+        (Lang::PtBr, Key::ScrollDone) => "Scroll concluído",
+        (Lang::En, Key::ScrollDone) => "Scroll complete",
+        (Lang::PtBr, Key::BannerDegraded) => "Modo degradado: mouse do terminal",
+        (Lang::En, Key::BannerDegraded) => "Degraded mode: terminal mouse",
+        (Lang::PtBr, Key::BannerPermission) => {
+            "Permissão negada em /dev/input; veja a ajuda ou use o mouse do terminal"
+        }
+        (Lang::En, Key::BannerPermission) => {
+            "Permission denied on /dev/input; see help or use the terminal mouse"
+        }
+        (Lang::PtBr, Key::BannerWaiting) => "Aguardando um mouse legível",
+        (Lang::En, Key::BannerWaiting) => "Waiting for a readable mouse",
+        (Lang::PtBr, Key::Histogram) => "Histograma",
+        (Lang::En, Key::Histogram) => "Histogram",
     }
 }
 

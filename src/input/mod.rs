@@ -1,5 +1,10 @@
+pub mod controller;
+pub mod evdev;
 pub mod mock;
+pub mod tui_mouse;
 
+pub use controller::InputController;
+pub use evdev::{discover, Discovery, EvdevRuntime, InputError, InputMode, InputStatus, Selection};
 pub use mock::DemoSource;
 
 use crate::core::device::{DeviceId, DeviceInfo};

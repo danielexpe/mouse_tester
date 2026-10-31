@@ -12,6 +12,7 @@ use crate::core::codes::{
 };
 use crate::core::effects::EffectKind;
 use crate::core::metrics::Confidence;
+use crate::core::modes::ScrollStep;
 use crate::core::scroll::ScrollAxis;
 use crate::i18n::{tr, Key};
 use crate::render::layout::{compute, LayoutKind};
@@ -56,10 +57,16 @@ pub fn render(frame: &mut Frame, app: &App) {
         LayoutKind::TooSmall => {}
     }
 
+    if !matches!(kind, LayoutKind::Wide | LayoutKind::Normal) {
+        render_banner_overlay(frame, app, areas.canvas);
+    }
+
     render_footer(frame, app, areas.footer);
 
     if app.show_help {
         render_help(frame, app);
+    } else if app.show_devices {
+        render_device_picker(frame, app);
     } else if app.flags.raw_log {
         render_log(frame, app);
     }
@@ -72,11 +79,14 @@ fn render_header(frame: &mut Frame, app: &App, area: Rect, kind: LayoutKind) {
         .primary_device()
         .map(|device| device.name.as_str())
         .unwrap_or_else(|| tr(app.lang, Key::NoDevice));
-    let source = app
-        .session
-        .last_source
-        .map(|source| source.label())
-        .unwrap_or("mock");
+    let source = if app.degraded {
+        "tui-mouse"
+    } else {
+        app.session
+            .last_source
+            .map(|source| source.label())
+            .unwrap_or("evdev")
+    };
     let mode = mode_label(app.lang, app.session.mode);
 
     let title = TextLine::from(vec![
@@ -114,25 +124,138 @@ fn render_header(frame: &mut Frame, app: &App, area: Rect, kind: LayoutKind) {
 
     let mut lines = vec![title, details];
     if matches!(kind, LayoutKind::Wide | LayoutKind::Normal) {
-        let hint = if app.demo_active {
-            tr(app.lang, Key::DemoHint)
+        if let Some(message) = banner_text(app) {
+            lines.push(TextLine::from(Span::styled(
+                message,
+                Style::default().fg(theme.danger),
+            )));
         } else {
-            tr(app.lang, Key::PhaseOneHint)
-        };
+            let hint = if app.demo_active {
+                tr(app.lang, Key::DemoHint)
+            } else {
+                tr(app.lang, Key::PhaseOneHint)
+            };
+            lines.push(TextLine::from(Span::styled(
+                hint,
+                Style::default().fg(theme.muted),
+            )));
+        }
+    }
+
+    let paragraph = Paragraph::new(lines).style(Style::default().bg(theme.surface).fg(theme.text));
+    frame.render_widget(paragraph, area);
+}
+
+fn banner_text(app: &App) -> Option<String> {
+    if let Some(message) = &app.device_message {
+        return Some(localize_banner(app, message));
+    }
+    if app.degraded {
+        return Some(tr(app.lang, Key::BannerDegraded).to_string());
+    }
+    if let Some(message) = &app.banner {
+        return Some(localize_banner(app, message));
+    }
+    None
+}
+
+fn localize_banner(app: &App, message: &str) -> String {
+    let lower = message.to_ascii_lowercase();
+    if lower.contains("permission") {
+        tr(app.lang, Key::BannerPermission).to_string()
+    } else if lower.contains("waiting") {
+        tr(app.lang, Key::BannerWaiting).to_string()
+    } else if lower.contains("combo") {
+        tr(app.lang, Key::BannerDegraded).to_string()
+    } else {
+        message.to_string()
+    }
+}
+
+fn render_banner_overlay(frame: &mut Frame, app: &App, area: Rect) {
+    let Some(message) = banner_text(app) else {
+        return;
+    };
+    if area.width < 8 || area.height < 2 {
+        return;
+    }
+    let banner = Rect::new(area.x + 1, area.y + 1, area.width.saturating_sub(2), 1);
+    let paragraph = Paragraph::new(message)
+        .style(Style::default().fg(app.theme.danger).bg(app.theme.surface))
+        .wrap(Wrap { trim: true });
+    frame.render_widget(Clear, banner);
+    frame.render_widget(paragraph, banner);
+}
+
+fn render_device_picker(frame: &mut Frame, app: &App) {
+    let area = centered(frame.area(), 76, 62);
+    let mut lines = vec![TextLine::from(Span::styled(
+        tr(app.lang, Key::DevicePickerHint),
+        Style::default().fg(app.theme.muted),
+    ))];
+
+    let devices = app.devices();
+    if devices.is_empty() {
+        lines.push(TextLine::from(tr(app.lang, Key::NoDevice)));
+    } else {
+        for (index, device) in devices.iter().enumerate() {
+            let marker = if index == app.device_index { ">" } else { " " };
+            let status = if device.readable {
+                tr(app.lang, Key::DeviceOk)
+            } else {
+                tr(app.lang, Key::DeviceDenied)
+            };
+            let primary = if app.session.primary == Some(device.id) {
+                format!(" [{}]", tr(app.lang, Key::DevicePrimary))
+            } else {
+                String::new()
+            };
+            let line = format!(
+                "{marker} {:<28} {:<8} {:<10} {status}{primary}",
+                truncate_text(&device.name, 28),
+                device.class.as_str(),
+                device.path.display()
+            );
+            let style = if index == app.device_index {
+                Style::default()
+                    .fg(app.theme.accent)
+                    .add_modifier(Modifier::BOLD)
+            } else {
+                Style::default().fg(if device.readable {
+                    app.theme.text
+                } else {
+                    app.theme.muted
+                })
+            };
+            lines.push(TextLine::from(Span::styled(line, style)));
+        }
+    }
+
+    if let Some(message) = &app.device_message {
         lines.push(TextLine::from(Span::styled(
-            hint,
-            Style::default().fg(theme.muted),
+            message.clone(),
+            Style::default().fg(app.theme.danger),
         )));
     }
 
     let paragraph = Paragraph::new(lines)
-        .style(Style::default().bg(theme.surface).fg(theme.text))
         .block(
-            Block::default()
-                .borders(Borders::BOTTOM)
-                .border_style(Style::default().fg(theme.border)),
-        );
+            panel_block(app.theme, tr(app.lang, Key::Devices))
+                .border_style(Style::default().fg(app.theme.accent)),
+        )
+        .style(Style::default().fg(app.theme.text))
+        .wrap(Wrap { trim: true });
+    frame.render_widget(Clear, area);
     frame.render_widget(paragraph, area);
+}
+
+fn truncate_text(value: &str, limit: usize) -> String {
+    let mut result: String = value.chars().take(limit).collect();
+    if value.chars().count() > limit {
+        result.pop();
+        result.push('…');
+    }
+    result
 }
 
 fn render_canvas(frame: &mut Frame, app: &App, area: Rect) {
@@ -326,6 +449,20 @@ fn render_compact_panels(frame: &mut Frame, app: &App, area: Rect) {
 fn render_buttons(frame: &mut Frame, app: &App, area: Rect) {
     let theme = app.theme;
     let mut lines = Vec::new();
+    if app.session.mode == Mode::Buttons {
+        let (done, total) = app.session.buttons_challenge.progress();
+        lines.push(TextLine::from(Span::styled(
+            format!("{done}/{total}"),
+            Style::default().fg(theme.accent),
+        )));
+        if let Some(code) = app.session.buttons_challenge.current() {
+            lines.push(TextLine::from(
+                tr(app.lang, Key::PressButton).replace("{button}", &label(code)),
+            ));
+        } else {
+            lines.push(TextLine::from(tr(app.lang, Key::AllButtonsSeen)));
+        }
+    }
     for code in BUTTONS {
         let runtime = app.session.buttons.runtime(code);
         let count = runtime.map(|runtime| runtime.press_count).unwrap_or(0);
@@ -362,7 +499,28 @@ fn render_motion(frame: &mut Frame, app: &App, area: Rect) {
         })
         .unwrap_or("-");
 
-    let lines = vec![
+    let mut lines = Vec::new();
+    if app.session.mode == Mode::Scroll {
+        let (done, total) = app.session.scroll_challenge.progress();
+        lines.push(TextLine::from(format!(
+            "{} {done}/{total}",
+            tr(app.lang, Key::Scroll)
+        )));
+        if let Some(step) = app.session.scroll_challenge.current() {
+            let direction = match step {
+                ScrollStep::Up => tr(app.lang, Key::ScrollStepUp),
+                ScrollStep::Down => tr(app.lang, Key::ScrollStepDown),
+                ScrollStep::Left => tr(app.lang, Key::ScrollStepLeft),
+                ScrollStep::Right => tr(app.lang, Key::ScrollStepRight),
+            };
+            lines.push(TextLine::from(
+                tr(app.lang, Key::ScrollPrompt).replace("{direction}", direction),
+            ));
+        } else {
+            lines.push(TextLine::from(tr(app.lang, Key::ScrollDone)));
+        }
+    }
+    lines.extend([
         TextLine::from(format!(
             "{} {:.0},{:.0}",
             tr(app.lang, Key::Position),
@@ -392,7 +550,7 @@ fn render_motion(frame: &mut Frame, app: &App, area: Rect) {
             tr(app.lang, Key::Events),
             app.session.metrics.events()
         )),
-    ];
+    ]);
 
     let paragraph = Paragraph::new(lines)
         .block(panel_block(theme, tr(app.lang, Key::Motion)))
@@ -417,6 +575,23 @@ fn render_metrics(frame: &mut Frame, app: &App, area: Rect) {
         Confidence::High => tr(app.lang, Key::ConfidenceHigh),
     };
 
+    let histogram = metrics.histogram(10, 20_000);
+    let peak = histogram.iter().copied().max().unwrap_or(0);
+    let bars: String = histogram
+        .iter()
+        .map(|count| {
+            if peak == 0 || *count == 0 {
+                ' '
+            } else if *count * 4 >= peak * 3 {
+                '#'
+            } else if *count * 2 >= peak {
+                ':'
+            } else {
+                '.'
+            }
+        })
+        .collect();
+
     let lines = vec![
         TextLine::from(format!("{} {rate}", tr(app.lang, Key::Rate))),
         TextLine::from(format!("{} {jitter}", tr(app.lang, Key::Jitter))),
@@ -431,6 +606,7 @@ fn render_metrics(frame: &mut Frame, app: &App, area: Rect) {
             tr(app.lang, Key::Reports),
             metrics.reports()
         )),
+        TextLine::from(format!("{} {bars}", tr(app.lang, Key::Histogram))),
     ];
 
     let paragraph = Paragraph::new(lines)
@@ -603,21 +779,24 @@ fn format_log(entry: &crate::state::LogEntry) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::app::{App, UiFlags};
+    use crate::app::{App, AppConfig, UiFlags};
     use crate::core::geometry::Bounds;
     use crate::i18n::Lang;
     use ratatui::backend::TestBackend;
     use ratatui::Terminal;
 
     fn app() -> App {
-        let mut app = App::new(
-            Bounds::new(1000, 800),
-            Lang::PtBr,
-            Theme::default(),
-            UiFlags::default(),
-            Mode::Dashboard,
-            Some(1),
-        );
+        let mut app = App::new(AppConfig {
+            bounds: Bounds::new(1000, 800),
+            lang: Lang::PtBr,
+            theme: Theme::default(),
+            flags: UiFlags::default(),
+            initial_mode: Mode::Dashboard,
+            demo_seed: Some(1),
+            controller: None,
+            grab: false,
+            grab_force: false,
+        });
         app.update(1_000_000);
         app
     }
@@ -654,6 +833,40 @@ mod tests {
         let text = buffer_text(&terminal);
         assert!(text.contains("Ajuda"));
         assert!(text.contains("teclado"));
+    }
+
+    #[test]
+    fn renders_device_picker() {
+        let backend = TestBackend::new(120, 36);
+        let mut terminal = Terminal::new(backend).unwrap();
+        let mut app = app();
+        app.show_devices = true;
+        terminal.draw(|frame| render(frame, &app)).unwrap();
+        let text = buffer_text(&terminal);
+        assert!(text.contains("Dispositivos"));
+        assert!(text.contains("Enter"));
+    }
+
+    #[test]
+    fn renders_degraded_banner() {
+        let backend = TestBackend::new(80, 24);
+        let mut terminal = Terminal::new(backend).unwrap();
+        let mut app = app();
+        app.degraded = true;
+        terminal.draw(|frame| render(frame, &app)).unwrap();
+        let text = buffer_text(&terminal);
+        assert!(text.contains("degradado") || text.contains("degraded"));
+    }
+
+    #[test]
+    fn renders_button_challenge() {
+        let backend = TestBackend::new(120, 36);
+        let mut terminal = Terminal::new(backend).unwrap();
+        let mut app = app();
+        app.session.set_mode(crate::state::Mode::Buttons);
+        terminal.draw(|frame| render(frame, &app)).unwrap();
+        let text = buffer_text(&terminal);
+        assert!(text.contains("Pressione") || text.contains("Press"));
     }
 
     #[test]

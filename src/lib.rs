@@ -1,6 +1,7 @@
 pub mod app;
 pub mod cli;
 pub mod core;
+pub mod diagnostics;
 pub mod i18n;
 pub mod input;
 pub mod platform;

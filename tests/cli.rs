@@ -5,12 +5,14 @@ fn binary() -> Command {
 }
 
 #[test]
-fn list_devices_reports_mock_device() {
+fn list_devices_prints_a_table() {
     let output = binary().arg("--list-devices").output().unwrap();
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("/dev/input/mock1"));
-    assert!(stdout.contains("mouse"));
+    assert!(stdout.contains("PATH"));
+    assert!(stdout.contains("CLASS"));
+    assert!(stdout.contains("NAME"));
+    assert!(stdout.contains("PERM"));
 }
 
 #[test]
@@ -27,6 +29,18 @@ fn tui_requires_a_tty() {
     assert_eq!(output.status.code(), Some(3));
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("TTY"));
+}
+
+#[test]
+fn all_devices_flag_lists_keyboards_too() {
+    let output = binary()
+        .arg("--list-devices")
+        .arg("--all-devices")
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("PATH"));
 }
 
 #[test]

@@ -9,6 +9,8 @@ use crate::core::codes::{
 
 pub type DeviceId = u32;
 
+pub const TUI_MOUSE_ID: DeviceId = DeviceId::MAX;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum DeviceClass {
     Mouse,
@@ -21,6 +23,18 @@ pub enum DeviceClass {
 }
 
 impl DeviceClass {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Mouse => "mouse",
+            Self::Touchpad => "touchpad",
+            Self::Tablet => "tablet",
+            Self::Keyboard => "keyboard",
+            Self::Joystick => "joystick",
+            Self::Combo => "combo",
+            Self::Unknown => "unknown",
+        }
+    }
+
     pub fn label_key(self) -> &'static str {
         match self {
             Self::Mouse => "class.mouse",
@@ -95,6 +109,34 @@ pub struct DeviceInfo {
 }
 
 impl DeviceInfo {
+    pub fn is_pointing(&self) -> bool {
+        matches!(
+            self.class,
+            DeviceClass::Mouse | DeviceClass::Combo | DeviceClass::Touchpad | DeviceClass::Tablet
+        ) || self.capabilities.mouse_like()
+    }
+
+    pub fn tui_mouse() -> Self {
+        let mut capabilities = Capabilities::default();
+        capabilities.keys.extend([BTN_LEFT, 0x111, 0x112]);
+        capabilities
+            .rel
+            .extend([REL_WHEEL, REL_WHEEL_HI_RES, REL_HWHEEL, REL_HWHEEL_HI_RES]);
+
+        Self {
+            id: TUI_MOUSE_ID,
+            path: PathBuf::from("tui://mouse"),
+            name: "Terminal mouse".to_string(),
+            phys: None,
+            uniq: None,
+            vendor: 0,
+            product: 0,
+            class: DeviceClass::Mouse,
+            capabilities,
+            readable: true,
+        }
+    }
+
     pub fn mock(id: DeviceId) -> Self {
         let mut capabilities = Capabilities::default();
         capabilities.rel.extend([
