@@ -1,8 +1,8 @@
 # MouseScope
 
-> **Status: Fase 2 implementada; validação evdev real pendente.** A TUI já lê
-> evdev quando há permissão, descobre dispositivos, faz hotplug, oferece
-> fallback degradado e desafios. framebuffer e captura ainda não existem.
+> **Status: Fase 2 implementada; evdev real validado.** A TUI lê evdev quando
+> há permissão, descobre dispositivos, faz hotplug, oferece fallback degradado e
+> desafios. framebuffer e captura ainda não existem.
 >
 > Nome provisório: **MouseScope** (`mousescope`). Veja a questão aberta Q-001 em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
@@ -39,9 +39,9 @@ Implementado:
 - TUI `ratatui` com banner, log, ajuda e layouts Wide/Normal/Compact/Minimal;
 - 120 testes (115 unitários + 5 de integração de CLI).
 
-Pendente de validação real: leitura de eventos evdev no hardware (o ambiente de
-desenvolvimento atual não tem o usuário no grupo `input`). O caminho degradado
-foi validado em PTY. Ainda não implementado: alvos/arraste/duplo clique,
+Leitura evdev validada com o mouse HID `1bcf:08a0` (fonte `evdev`). O caminho
+degradado foi validado em PTY. Pendentes: exercício de extras/scroll hi-res e
+hotplug em hardware, snapshots completos, alvos/arraste/duplo clique,
 framebuffer e captura PNG.
 
 ## Rodando
@@ -162,8 +162,9 @@ pode ler teclado).
 - O fallback `crossterm` não fornece movimento relativo bruto nem taxa de
   relatório; não há hover em muitos terminais. Ele é ativado apenas quando evdev
   não está disponível (ou com `--tui-mouse on`).
-- A leitura evdev real ainda não foi validada neste ambiente por falta de
-  permissão em `/dev/input`; o parser e o caminho degradado foram testados.
+- A leitura evdev foi validada com o mouse HID `1bcf:08a0`; dispositivos sem
+  permissão em `/dev/input` caem no fallback degradado ou exigem o grupo
+  `input`.
 - A taxa de relatório é uma **estimativa** medida, não a configuração nominal do
   mouse; coalescência do kernel/driver pode reduzi-la.
 - Não mede DPI, latência de clique ponta a ponta, latência wireless ou qualidade

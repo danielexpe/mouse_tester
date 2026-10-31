@@ -75,7 +75,8 @@ Evidência: `cargo test` = 74 unitários + 4 integração; smoke em `script` PTY
 
 ## 5. Fase 2 — TUI funcional com evdev
 
-**Status:** implementada; validação em hardware pendente por permissão.
+**Status:** implementada; leitura evdev validada em hardware; critérios parciais
+pendentes.
 
 Objetivo: o produto principal funcionando no terminal.
 
@@ -101,7 +102,7 @@ Entregáveis:
 
 Critérios de saída:
 
-- [ ] Fluxo completo com mouse real na TUI (bloqueado: usuário fora de `input`).
+- [x] Fluxo básico com mouse real na TUI (mouse HID 1bcf:08a0, fonte `evdev`, terminal GNOME).
 - [ ] Botões advertising e extras (pendente de hardware).
 - [ ] Scroll vertical/horizontal e hi-res sem dupla contagem (parser testado; hardware pendente).
 - [ ] Hotplug ≤ 2 s (implementado; hardware pendente).
@@ -113,8 +114,9 @@ Critérios de saída:
 Evidência: 115 unitários + 5 de integração; descoberta real lista
 `/dev/input/event3` como mouse `denied`; TUI degradada validada em PTY 120×36 e
 80×24, inclusive clique L via protocolo SGR; `--diagnostics` gerado;
-`--require-evdev` retorna 4. A leitura real de eventos evdev não foi exercitada
-porque o usuário não está no grupo `input`.
+`--require-evdev` retorna 4. Leitura evdev validada com o mouse HID
+`1bcf:08a0` (fonte `evdev`) em terminal GNOME; extras, scroll hi-res e hotplug
+seguem pendentes de exercício ponta a ponta.
 
 ## 6. Fase 3 — Modos ricos, acessibilidade e captura
 

@@ -16,7 +16,7 @@ Data de referência: **2026-10-31**.
 | --- | --- | --- |
 | 0 — Descoberta e especificação | concluída | escopo aprovado pelo usuário em 2026-10-31 |
 | 1 — Fundação | concluída | crate, domínio puro, CLI, mock, TUI placeholder; 78 testes |
-| 2 — TUI funcional | implementada; validação real pendente | evdev, descoberta, hotplug, fallback, desafios, diagnóstico |
+| 2 — TUI funcional | implementada; evdev real validado | mouse HID 1bcf:08a0; extras/hotplug/snapshots pendentes |
 | 3 — Modos ricos | pendente | alvos/arraste/clique duplo, polimento |
 | 4 — Framebuffer | pendente | fbdev, cursor, sinais, validação em VT |
 | 5 — Release | pendente | pacote, instalador, diagnóstico, matriz manual |
@@ -24,9 +24,10 @@ Data de referência: **2026-10-31**.
 
 As Fases 1 e 2 foram implementadas. A TUI abre e fecha via PTY; a entrada evdev
 foi implementada com descoberta, classificação, thread de leitura, hotplug e
-fallback `crossterm`. O ambiente atual não tem permissão em `/dev/input`, então
-a leitura real de eventos ficou **pendente de validação**; o modo degradado foi
-validado em PTY. framebuffer e captura ainda não existem.
+fallback `crossterm`. A leitura real foi validada com o mouse HID `1bcf:08a0`
+(fonte `evdev`) em terminal GNOME; o modo degradado também foi validado em PTY.
+Extras, scroll hi-res, hotplug e snapshots completos seguem pendentes.
+framebuffer e captura ainda não existem.
 
 ## 3. Resumo do produto
 
@@ -141,6 +142,7 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Leitura do framework e criação das especificações iniciais (Fase 0). Nenhum código. | `README.md`, `AGENTS.md`, `docs/01`..`docs/10` |
 | 2026-10-31 | Fase 1 implementada: crate, domínio puro, input mock, CLI, TUI placeholder e guardas. 78 testes; TUI validada em PTY com `q`. Sem evdev/fb. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/cli.rs`, `README.md`, `AGENTS.md`, `docs/06-roadmap.md` |
 | 2026-10-31 | Fase 2 implementada: evdev (descoberta, classificação, thread, hotplug), fallback TUI, seletor, desafios, diagnóstico. 120 testes; modo degradado e clique SGR validados em PTY. Leitura real pendente por falta de permissão em `/dev/input`. | `src/input/`, `src/platform/evdev.rs`, `src/core/modes/`, `src/diagnostics.rs`, `src/app.rs`, `src/render/tui.rs`, docs |
+| 2026-10-31 | Leitura evdev validada em hardware com mouse HID `1bcf:08a0` (fonte `evdev`) em terminal GNOME. Modo degradado segue validado em PTY; extras/hotplug/snapshots pendentes. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-input-spec.md` |
 
 ## 11. Fases
 
@@ -156,12 +158,11 @@ declarar validação manual sem execução registrada.
 
 ## 12. Notas para a próxima sessão
 
-- Fase 2 implementada; falta validar leitura evdev com permissão real.
-- No ambiente atual o usuário não está no grupo `input`; `/dev/input/event3`
-  está `root:input 660` e o app caiu para o modo degradado.
-- Próximo passo: validar evdev real em uma sessão com `newgrp input`/novo login
-  (ou grupo dono equivalente), registrar modelo/taxa/botões e então iniciar a
-  Fase 3 (alvos/arraste/duplo clique e captura).
+- Fase 2 implementada; leitura evdev validada com mouse HID `1bcf:08a0`
+  (fonte `evdev`) em terminal GNOME.
+- Próximo passo: iniciar a Fase 3 (alvos/arraste/duplo clique e captura),
+  cobrindo extras/hotplug/snapshots pendentes quando possível.
+- VT Linux não recebe mouse sem evdev; o suporte completo a console depende do
+  backend framebuffer da Fase 4.
 - Q-001..Q-008 continuam em aberto; os defaults estão em uso.
 - Definir hardware/distro de validação (Q-004) antes da Fase 4.
-- Não iniciar fbdev antes da validação básica da TUI com evdev real.
