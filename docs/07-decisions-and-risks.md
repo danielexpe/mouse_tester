@@ -219,7 +219,7 @@ Detalhes em `docs/02-technical-spec.md`.
 
 | ID | Questão | Default proposto | Prazo | Responsável |
 | --- | --- | --- | --- | --- |
-| Q-001 | Nome/binary definitivos? | resolvida: `Mouse Test`/`mouse_test` | antes da Fase 1 | usuário |
+| Q-001 | Nome/binary definitivos? | resolvida: `Mouse Tester`/`mouse_tester` | antes da Fase 1 | usuário |
 | Q-002 | Distribuição pessoal ou release pública? | release pública | antes da Fase 5 | usuário |
 | Q-003 | Instalador adiciona ao grupo `input`? | apenas instruir; flag `--add-input-group` | antes da Fase 5 | usuário |
 | Q-004 | Hardware/distro para validar fb? | resolvida: Zorin OS 18.1 (base Ubuntu), VT `tty2`, 1920×1080 32 bpp | antes da Fase 4 | usuário |
@@ -233,7 +233,7 @@ Detalhes em `docs/02-technical-spec.md`.
 - [ ] O usuário tem ou conseguirá permissão de leitura em `/dev/input/event*`.
 - [ ] O terminal alvo suporta TUI e, no modo degradado, mouse do terminal.
 - [ ] Existe um VT de texto local para validar fb (ou aceitar pendência).
-- [x] Nome definitivo confirmado: `Mouse Test`/`mouse_test`.
+- [x] Nome definitivo confirmado: `Mouse Tester`/`mouse_tester`.
 - [ ] MIT + CC BY 4.0 + OFL são aceitáveis.
 - [ ] Não há requisito oculto de Windows/macOS, rede ou áudio.
 - [ ] O escopo “teste visual + diagnóstico” é suficiente; não é ferramenta de

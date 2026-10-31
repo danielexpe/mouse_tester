@@ -1,7 +1,7 @@
 use std::process::Command;
 
 fn binary() -> Command {
-    Command::new(env!("CARGO_BIN_EXE_mouse_test"))
+    Command::new(env!("CARGO_BIN_EXE_mouse_tester"))
 }
 
 #[test]
@@ -48,13 +48,13 @@ fn version_is_available() {
     let output = binary().arg("--version").output().unwrap();
     assert!(output.status.success());
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("mouse_test"));
+    assert!(stdout.contains("mouse_tester"));
 }
 
 #[test]
 fn capture_frame_writes_png_without_tty() {
     let path = std::env::temp_dir().join(format!(
-        "mouse_test-capture-{}-{}.png",
+        "mouse_tester-capture-{}-{}.png",
         std::process::id(),
         std::thread::current().name().unwrap_or("test")
     ));
@@ -81,7 +81,7 @@ fn capture_frame_writes_png_without_tty() {
 fn capture_frame_invalid_path_exits_one() {
     let output = binary()
         .arg("--capture-frame")
-        .arg("/proc/mouse_test/denied.png")
+        .arg("/proc/mouse_tester/denied.png")
         .output()
         .unwrap();
     assert_eq!(output.status.code(), Some(1));

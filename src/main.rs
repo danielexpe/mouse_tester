@@ -8,15 +8,15 @@ use crossterm::event::{self, Event};
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
 
-use mouse_test::app::{App, AppConfig, UiFlags};
-use mouse_test::cli::{BackendArg, Cli, TuiMouseArg};
-use mouse_test::core::device::DeviceInfo;
-use mouse_test::core::geometry::Bounds;
-use mouse_test::input::{discover, InputController, InputError, Selection};
-use mouse_test::platform::fb::{self, FbConsole, FbDevice, FbError};
-use mouse_test::platform::signals;
-use mouse_test::platform::{install_panic_hook, set_mouse_capture, TuiGuard};
-use mouse_test::theme::Theme;
+use mouse_tester::app::{App, AppConfig, UiFlags};
+use mouse_tester::cli::{BackendArg, Cli, TuiMouseArg};
+use mouse_tester::core::device::DeviceInfo;
+use mouse_tester::core::geometry::Bounds;
+use mouse_tester::input::{discover, InputController, InputError, Selection};
+use mouse_tester::platform::fb::{self, FbConsole, FbDevice, FbError};
+use mouse_tester::platform::signals;
+use mouse_tester::platform::{install_panic_hook, set_mouse_capture, TuiGuard};
+use mouse_tester::theme::Theme;
 
 #[derive(Debug, thiserror::Error)]
 enum RunError {
@@ -47,7 +47,7 @@ fn main() -> ExitCode {
     match run(cli) {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("mouse_test: {error}");
+            eprintln!("mouse_tester: {error}");
             ExitCode::from(error.exit_code())
         }
     }
@@ -60,12 +60,12 @@ fn run(cli: Cli) -> Result<(), RunError> {
     }
 
     if let Some(path) = &cli.diagnostics {
-        mouse_test::diagnostics::write_report(path)?;
+        mouse_tester::diagnostics::write_report(path)?;
         return Ok(());
     }
 
     if let Some(path) = &cli.capture_frame {
-        mouse_test::render::capture::write_capture(path, cli.seed)?;
+        mouse_tester::render::capture::write_capture(path, cli.seed)?;
         return Ok(());
     }
 
@@ -131,7 +131,7 @@ fn run_fb(cli: Cli) -> Result<(), RunError> {
         }
         let now_us = started.elapsed().as_micros() as u64;
         app.update(now_us);
-        let frame = mouse_test::render::fb::render(&app, device.xres(), device.yres());
+        let frame = mouse_tester::render::fb::render(&app, device.xres(), device.yres());
         device.present(&frame).map_err(map_fb_error)?;
 
         if app.quit {
@@ -171,10 +171,10 @@ fn list_devices(all_devices: bool) -> Result<(), RunError> {
         );
     }
     if discovery.devices.is_empty() {
-        eprintln!("mouse_test: no input devices found in /proc/bus/input/devices");
+        eprintln!("mouse_tester: no input devices found in /proc/bus/input/devices");
     }
     for warning in &discovery.warnings {
-        eprintln!("mouse_test: {warning}");
+        eprintln!("mouse_tester: {warning}");
     }
     stdout().flush()?;
     Ok(())
@@ -224,7 +224,7 @@ fn run_tui(cli: Cli) -> Result<(), RunError> {
         }
 
         terminal
-            .draw(|frame| mouse_test::render::render(frame, &app))
+            .draw(|frame| mouse_tester::render::render(frame, &app))
             .map_err(RunError::Io)?;
 
         if app.quit {
@@ -241,7 +241,7 @@ fn run_tui(cli: Cli) -> Result<(), RunError> {
                 Event::Key(key) => app.handle_key(key),
                 Event::Mouse(mouse) if mouse_capture => {
                     let size = terminal.size()?;
-                    let events = mouse_test::input::tui_mouse::map_mouse_event(
+                    let events = mouse_tester::input::tui_mouse::map_mouse_event(
                         mouse,
                         size.width,
                         size.height,

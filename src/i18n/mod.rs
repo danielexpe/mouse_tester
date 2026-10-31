@@ -108,8 +108,8 @@ pub enum Key {
 
 pub fn tr(lang: Lang, key: Key) -> &'static str {
     match (lang, key) {
-        (Lang::PtBr, Key::AppTitle) => "Mouse Test",
-        (Lang::En, Key::AppTitle) => "Mouse Test",
+        (Lang::PtBr, Key::AppTitle) => "Mouse Tester",
+        (Lang::En, Key::AppTitle) => "Mouse Tester",
         (Lang::PtBr, Key::Subtitle) => "Laboratório visual de mouse",
         (Lang::En, Key::Subtitle) => "Visual mouse lab",
         (Lang::PtBr, Key::Phase) => "Fase 3",

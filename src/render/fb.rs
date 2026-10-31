@@ -147,12 +147,12 @@ fn draw_header(frame: &mut Frame, app: &App, area: Rect, scale: i32) {
     frame.text(
         area.x + pad,
         area.y + pad,
-        "MOUSE TEST",
+        "MOUSE TESTER",
         rgba(theme.accent),
         title_scale,
     );
     frame.text(
-        area.x + pad + 11 * 6 * title_scale,
+        area.x + pad + 13 * 6 * title_scale,
         area.y + pad + title_scale,
         &format!("V{}", env!("CARGO_PKG_VERSION")),
         rgba(theme.muted),

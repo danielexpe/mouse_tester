@@ -35,7 +35,7 @@ Princípios:
 ### 2.2 Wide (referência)
 
 ```text
-+ Mouse Test  v0.1.0 ------------------------------------------------+
++ Mouse Tester  v0.1.0 ------------------------------------------------+
 | Logitech G Pro | event5 | 1000 Hz estimado (alta) | evdev         |
 +------------------------------------+-----------------------------+
 |                                    | BOTOES                      |
@@ -56,7 +56,7 @@ Princípios:
 ### 2.3 Compact
 
 ```text
-+ Mouse Test  event5  1000 Hz (alta) ------------------+
++ Mouse Tester  event5  1000 Hz (alta) ------------------+
 |                                                      |
 |                 canvas reduzido                      |
 |                                                      |
@@ -71,7 +71,7 @@ Princípios:
 ### 2.4 Minimal
 
 ```text
-Mouse Test  event5  evdev  1000 Hz (alta)
+Mouse Tester  event5  evdev  1000 Hz (alta)
 dx +148  dy -32   vel 934 c/s
 [L] [R] [M] [S1] [S2]   scroll V +12  H 0
 TAB modo  T disp.  Q sair

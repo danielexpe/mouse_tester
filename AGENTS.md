@@ -36,7 +36,7 @@ falso negativo na detecção de VT.
 
 ## 3. Resumo do produto
 
-**Mouse Test** é um teste visual de mouse para console Linux. Lê eventos de
+**Mouse Tester** é um teste visual de mouse para console Linux. Lê eventos de
 mouse via evdev e representa movimento, botões, scroll, botões extras, arraste e
 taxa de relatório com efeitos em uma TUI (`ratatui`) ou no framebuffer
 (`/dev/fb0`). O mouse é o objeto do teste; a UI é navegada apenas por teclado.
@@ -88,7 +88,7 @@ Não reabrir sem pedido explícito do usuário; mudanças exigem novo ADR.
 
 | ID | Questão | Default proposto | Prazo |
 | --- | --- | --- | --- |
-| Q-001 | Confirmar nome/binary `Mouse Test`/`mouse_test`. | resolvida: `Mouse Test`/`mouse_test` | antes da Fase 5 |
+| Q-001 | Confirmar nome/binary `Mouse Tester`/`mouse_tester`. | resolvida: `Mouse Tester`/`mouse_tester` | antes da Fase 5 |
 | Q-002 | Distribuição pessoal ou release pública? | release pública | antes da Fase 5 |
 | Q-003 | Instalador deve adicionar o usuário ao grupo `input`? | apenas instruir; flag opcional | antes da Fase 5 |
 | Q-004 | Hardware/distro alvo para validar fbdev? | resolvida: Zorin OS 18.1 / base Ubuntu, VT `tty3` 1920×1080 32 bpp | antes da Fase 4 |
@@ -151,9 +151,10 @@ declarar validação manual sem execução registrada.
 | 2026-10-31 | Leitura evdev validada em hardware com mouse HID `1bcf:08a0` (fonte `evdev`) em terminal GNOME. Modo degradado segue validado em PTY; extras/hotplug/snapshots pendentes. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/09-input-spec.md` |
 | 2026-10-31 | Fase 3 implementada: modo Alvos (clique/arraste/duplo clique, seed, métricas), captura PNG determinística 1344×756 sem dependências, snapshots de TUI, snapshot de captura e teste de contraste. 144 testes. Performance de TUI ainda não medida. | `src/core/modes/targets.rs`, `src/render/capture.rs`, `src/state/session.rs`, `src/render/tui.rs`, `tests/snapshots.rs`, docs |
 | 2026-10-31 | Validação manual do usuário: botões extras, scroll hi-res/horizontal e hotplug OK; modo Alvos e captura testados. Q-004 respondida: Zorin OS 18.1 (base Ubuntu noble), VT `tty2`, `/dev/fb0` 1920×1080 32 bpp; alvo: distros base Ubuntu. | `AGENTS.md`, `README.md`, `docs/06-roadmap.md`, `docs/07-decisions-and-risks.md` |
-| 2026-10-31 | Q-001 resolvida: pacote/binário renomeados para `mouse_test` e UI para `Mouse Test` em código, docs, testes, snapshots e captura. `rodar.sh` removido do Git e mantido local. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, docs |
+| 2026-10-31 | Q-001 resolvida: pacote/binário renomeados para `mouse_tester` e UI para `Mouse Tester` em código, docs, testes, snapshots e captura. `rodar.sh` removido do Git e mantido local. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, docs |
 | 2026-10-31 | Fase 4 implementada: `platform/fb.rs` (validação, mmap, 32/24/16 bpp, pan/fallback, KD_GRAPHICS, blank, console), `render/fb.rs` com rasterizador/fonte 5×7, sinais, `--fb-device`, `testes_debug.sh` com preflight fb opcional (`--with-fb`). 164 testes sem hardware verdes; validação em VT real pendente. | `src/platform/fb.rs`, `src/platform/signals.rs`, `src/render/fb.rs`, `src/render/raster.rs`, `src/main.rs`, `src/cli.rs`, `testes_debug.sh`, docs |
 | 2026-10-31 | Fase 4 validada pelo usuário em `tty3` (Zorin OS 18.1, 1920×1080 32 bpp). Corrigidos eixo Y invertido no fb e detecção de VT (`ttyname` genérico + `/sys/class/tty/tty0/active`). `testes_debug.sh` passou a ter preflight fb opcional (`--with-fb`) e `timeout -k`. 164 testes. Pendentes: 24/16 bpp em hardware, sinais/pânico do fb e performance da TUI. | `src/render/fb.rs`, `src/platform/fb.rs`, `testes_debug.sh`, docs |
+| 2026-10-31 | Nome final ajustado para `mouse_tester`/`Mouse Tester` em pacote, binário, UI, docs, testes, snapshots e captura. Criado repositório público `danielexpe/mouse_tester`; `origin` aponta para ele e o antigo template fica como `template`. | `Cargo.toml`, `Cargo.lock`, `src/`, `tests/`, `testes_debug.sh`, docs |
 
 ## 11. Fases
 

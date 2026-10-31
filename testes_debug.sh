@@ -10,10 +10,10 @@ if [ "${1:-}" = "--with-fb" ]; then
     shift
 fi
 OUT=${1:-testes_debug.txt}
-BIN=${MOUSE_TEST_BIN:-}
+BIN=${MOUSE_TESTER_BIN:-}
 
 if [ -z "$BIN" ]; then
-    for candidate in ./target/release/mouse_test ./target/debug/mouse_test; do
+    for candidate in ./target/release/mouse_tester ./target/debug/mouse_tester; do
         if [ -x "$candidate" ]; then
             BIN=$candidate
             break
@@ -21,7 +21,7 @@ if [ -z "$BIN" ]; then
     done
 fi
 if [ -z "$BIN" ]; then
-    BIN=$(command -v mouse_test 2>/dev/null || true)
+    BIN=$(command -v mouse_tester 2>/dev/null || true)
 fi
 
 say() {
@@ -48,7 +48,7 @@ run_bounded() {
 }
 
 : >"$OUT"
-say "mouse_test debug report"
+say "mouse_tester debug report"
 say "date=$(date -Is 2>/dev/null || date)"
 say "cwd=$(pwd)"
 say "binary=${BIN:-not found}"
@@ -118,11 +118,11 @@ else
 fi
 
 if [ -n "$BIN" ] && [ -x "$BIN" ]; then
-    progress "coletando mouse_test"
-    section "mouse_test"
+    progress "coletando mouse_tester"
+    section "mouse_tester"
     run "$BIN" --version
     run "$BIN" --list-devices --all-devices
-    TMP=$(mktemp 2>/dev/null || echo "/tmp/mouse_test_diag.$$")
+    TMP=$(mktemp 2>/dev/null || echo "/tmp/mouse_tester_diag.$$")
     if "$BIN" --diagnostics "$TMP" >>"$OUT" 2>&1; then
         say "--- diagnostics ---"
         cat "$TMP" >>"$OUT"
@@ -144,7 +144,7 @@ if [ -n "$BIN" ] && [ -x "$BIN" ]; then
         say "skipped; use --with-fb para executar o backend fb por até 5 s"
     fi
 else
-    section "mouse_test"
+    section "mouse_tester"
     say "binary not found; build with cargo build --release"
 fi
 

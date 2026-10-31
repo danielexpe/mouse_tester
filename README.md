@@ -1,11 +1,11 @@
-# Mouse Test
+# Mouse Tester
 
 > **Status: Fase 4 implementada e validada em VT.** A TUI lê evdev quando há
 > permissão, descobre dispositivos, faz hotplug, oferece fallback degradado,
 > desafios, Alvos e captura PNG. O backend framebuffer foi validado em VT
 > local 1920×1080 32 bpp.
 >
-> Nome e binário: **Mouse Test** (`mouse_test`). Q-001 resolvida em
+> Nome e binário: **Mouse Tester** (`mouse_tester`). Q-001 resolvida em
 > [`docs/07-decisions-and-risks.md`](docs/07-decisions-and-risks.md).
 
 Aplicativo Rust para console Linux que transforma cada ação de um mouse em
@@ -132,11 +132,11 @@ modos 2 e 3; o modo Alvos (clique, arraste e duplo clique) é o modo 5.
 ## Instalação planejada
 
 ```text
-mouse_test                          # TUI, evdev ou fallback
-mouse_test --backend fb             # console, exige VT e permissões
-mouse_test --list-devices           # lista pontos de entrada
-mouse_test --diagnostics diag.txt   # ambiente, permissões e capacidades
-mouse_test --capture-frame qa.png   # PNG determinístico de QA
+mouse_tester                          # TUI, evdev ou fallback
+mouse_tester --backend fb             # console, exige VT e permissões
+mouse_tester --list-devices           # lista pontos de entrada
+mouse_tester --diagnostics diag.txt   # ambiente, permissões e capacidades
+mouse_tester --capture-frame qa.png   # PNG determinístico de QA
 ```
 
 O pacote futuro incluirá binário, `README`, licenças, `install.sh` e

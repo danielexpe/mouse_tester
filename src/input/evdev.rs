@@ -338,7 +338,7 @@ impl EvdevRuntime {
             stop: Arc::clone(&stop),
         };
         let join = thread::Builder::new()
-            .name("mouse_test-evdev".to_string())
+            .name("mouse_tester-evdev".to_string())
             .spawn(move || reader.run())
             .map_err(InputError::Io)?;
 
@@ -1104,7 +1104,7 @@ B: ABS=260800000000003
     #[test]
     fn explicit_missing_device_is_an_error() {
         let result = EvdevRuntime::start(
-            Selection::Path(PathBuf::from("/dev/input/mouse_test-no-such-device")),
+            Selection::Path(PathBuf::from("/dev/input/mouse_tester-no-such-device")),
             false,
             false,
         );

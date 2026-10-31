@@ -347,7 +347,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mouse_test"
+name = "mouse_tester"
 version = "0.1.0"
 dependencies = [
  "clap",

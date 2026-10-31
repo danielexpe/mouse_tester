@@ -939,7 +939,7 @@ mod tests {
         let app = app();
         terminal.draw(|frame| render(frame, &app)).unwrap();
         let text = buffer_text(&terminal);
-        assert!(text.contains("Mouse Test"));
+        assert!(text.contains("Mouse Tester"));
         assert!(text.contains("Painel"));
         assert!(text.contains("Botões"));
     }
